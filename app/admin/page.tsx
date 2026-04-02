@@ -30,6 +30,7 @@ export default function AdminPage() {
   const [selectedNode, setSelectedNode] = useState<FolderTreeNode | null>(null);
   const [editorContent, setEditorContent] = useState("");
   const [activeTheme, setActiveTheme] = useState<string>("dark");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const saveRef = useRef<(() => void) | null>(null);
 
   const fetchTree = useCallback(async () => {
@@ -100,17 +101,18 @@ export default function AdminPage() {
       </div>
 
       {/* Main layout: sidebar + editor + preview */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* On mobile: flex-col (sidebar stacked above editor); on sm+: flex-row */}
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
         {/* Sidebar: file tree */}
         <aside
-          className="flex flex-col shrink-0 border-r overflow-hidden"
+          className="flex flex-col shrink-0 border-b sm:border-b-0 sm:border-r overflow-hidden"
           style={{
-            width: "240px",
+            width: sidebarOpen ? undefined : undefined,
             borderColor: "var(--border)",
             backgroundColor: "var(--bg-secondary)",
           }}
         >
-          {/* Sidebar header */}
+          {/* Sidebar header with collapsible toggle */}
           <div
             className="flex items-center justify-between px-3 py-2 border-b shrink-0"
             style={{
@@ -118,27 +120,56 @@ export default function AdminPage() {
               backgroundColor: "var(--bg-secondary)",
             }}
           >
-            <span className="text-xs font-semibold" style={{ color: "var(--text-muted)" }}>
+            <button
+              onClick={() => setSidebarOpen((o) => !o)}
+              className="flex items-center gap-1.5 text-xs font-semibold select-none"
+              style={{ color: "var(--text-muted)" }}
+              aria-expanded={sidebarOpen}
+              aria-label="파일 탐색기 토글"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-3.5 h-3.5 transition-transform duration-200"
+                style={{ transform: sidebarOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                  clipRule="evenodd"
+                />
+              </svg>
               파일 탐색기
-            </span>
+            </button>
             <ThemeSelector onThemeChange={setActiveTheme} />
           </div>
 
-          {/* Tree */}
-          {loading ? (
+          {/* Tree — collapsible */}
+          {sidebarOpen && (
             <div
-              className="flex flex-1 items-center justify-center text-xs"
-              style={{ color: "var(--text-muted)" }}
+              className="overflow-hidden sm:overflow-auto"
+              style={{ maxHeight: "40vh", minWidth: "200px" }}
             >
-              로딩 중...
+              <div className="sm:w-60">
+                {loading ? (
+                  <div
+                    className="flex items-center justify-center text-xs py-6"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    로딩 중...
+                  </div>
+                ) : (
+                  <AdminTree
+                    tree={tree}
+                    selectedId={selectedNode?.id ?? null}
+                    onSelect={handleSelectNode}
+                    onTreeChange={fetchTree}
+                  />
+                )}
+              </div>
             </div>
-          ) : (
-            <AdminTree
-              tree={tree}
-              selectedId={selectedNode?.id ?? null}
-              onSelect={handleSelectNode}
-              onTreeChange={fetchTree}
-            />
           )}
         </aside>
 

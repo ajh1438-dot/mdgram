@@ -51,7 +51,7 @@ export default function HeroSection() {
       {/* Hero text */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-2xl">
         <motion.h1
-          className="text-5xl sm:text-7xl font-bold tracking-tight text-text leading-tight"
+          className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-text leading-tight"
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -60,7 +60,7 @@ export default function HeroSection() {
         </motion.h1>
 
         <motion.p
-          className="mt-5 text-lg sm:text-2xl text-text-muted font-medium"
+          className="mt-4 sm:mt-5 text-base sm:text-lg md:text-2xl text-text-muted font-medium"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -69,7 +69,7 @@ export default function HeroSection() {
         </motion.p>
 
         <motion.p
-          className="mt-3 text-sm sm:text-base text-accent font-semibold tracking-wide uppercase"
+          className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-base text-accent font-semibold tracking-wide uppercase"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}

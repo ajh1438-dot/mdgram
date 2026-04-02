@@ -53,6 +53,15 @@ export default function MindmapBackground({ onNodeClick }: Props) {
     const width = svgRef.current.clientWidth || window.innerWidth;
     const height = svgRef.current.clientHeight || window.innerHeight;
 
+    // Detect mobile for performance tuning
+    const isMobile = width < 768;
+    const nodeRadius = isMobile ? 24 : 36;
+    const nodeHoverRadius = isMobile ? 28 : 42;
+    const linkDistance = isMobile ? 90 : 140;
+    const collideRadius = isMobile ? 40 : 60;
+    const chargeStrength = isMobile ? -160 : -280;
+    const alphaDecayValue = isMobile ? 0.05 : 0.02;
+
     // Get CSS variable colors
     const style = getComputedStyle(document.documentElement);
     const accent = style.getPropertyValue("--accent").trim() || "#6366f1";
@@ -79,12 +88,12 @@ export default function MindmapBackground({ onNodeClick }: Props) {
         d3
           .forceLink<GraphNode, GraphLink>(links)
           .id((d) => d.id)
-          .distance(140)
+          .distance(linkDistance)
           .strength(0.6)
       )
-      .force("charge", d3.forceManyBody().strength(-280))
+      .force("charge", d3.forceManyBody().strength(chargeStrength))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide(60));
+      .force("collision", d3.forceCollide(collideRadius));
 
     const g = svg.append("g");
 
@@ -115,7 +124,7 @@ export default function MindmapBackground({ onNodeClick }: Props) {
     // Circles
     node
       .append("circle")
-      .attr("r", 36)
+      .attr("r", nodeRadius)
       .attr("fill", bgColor)
       .attr("fill-opacity", 0.55)
       .attr("stroke", accent)
@@ -130,7 +139,7 @@ export default function MindmapBackground({ onNodeClick }: Props) {
       .attr("dominant-baseline", "middle")
       .attr("fill", textColor)
       .attr("fill-opacity", 0.7)
-      .attr("font-size", "13px")
+      .attr("font-size", isMobile ? "10px" : "13px")
       .attr("font-weight", "500")
       .attr("pointer-events", "none");
 
@@ -143,7 +152,7 @@ export default function MindmapBackground({ onNodeClick }: Props) {
           .duration(200)
           .attr("stroke-opacity", 0.9)
           .attr("fill-opacity", 0.75)
-          .attr("r", 42);
+          .attr("r", nodeHoverRadius);
         d3.select(this)
           .select("text")
           .transition()
@@ -157,7 +166,7 @@ export default function MindmapBackground({ onNodeClick }: Props) {
           .duration(200)
           .attr("stroke-opacity", 0.45)
           .attr("fill-opacity", 0.55)
-          .attr("r", 36);
+          .attr("r", nodeRadius);
         d3.select(this)
           .select("text")
           .transition()
@@ -183,11 +192,12 @@ export default function MindmapBackground({ onNodeClick }: Props) {
       node.attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`);
     });
 
-    // Settle then idle
+    // Settle then idle — faster on mobile for perf
+    const settleDelay = isMobile ? 800 : 2000;
     setTimeout(() => {
-      simulation.alphaDecay(0.02);
+      simulation.alphaDecay(alphaDecayValue);
       simulation.alpha(0.05).restart();
-    }, 2000);
+    }, settleDelay);
 
     return () => {
       simulation.stop();

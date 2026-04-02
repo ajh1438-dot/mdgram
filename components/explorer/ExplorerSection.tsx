@@ -38,21 +38,21 @@ export default function ExplorerSection() {
   return (
     <section
       id="explore"
-      className="relative min-h-screen bg-[var(--bg-secondary)] px-6 py-20"
+      className="relative min-h-screen bg-[var(--bg-secondary)] px-3 py-12 sm:px-6 sm:py-20 w-full"
     >
       {/* Section header */}
-      <div className="max-w-3xl mx-auto mb-10">
+      <div className="max-w-3xl mx-auto mb-8 sm:mb-10">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--text)]">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text)]">
               숲을 탐색하기
             </h2>
-            <p className="mt-1 text-sm text-[var(--text-muted)]">
+            <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
               생각의 나무를 펼쳐보세요 — 항목을 클릭하면 내용이 열립니다.
             </p>
           </div>
-          {/* Mindmap mini toggle — top-right of the section header */}
-          <div className="flex-shrink-0 pt-1">
+          {/* Mindmap mini toggle — hidden on mobile, visible on sm+ */}
+          <div className="hidden sm:block flex-shrink-0 pt-1">
             <MindmapMini tree={tree} />
           </div>
         </div>

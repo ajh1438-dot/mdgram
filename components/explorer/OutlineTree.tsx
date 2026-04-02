@@ -127,7 +127,7 @@ function OutlineNode({
   const isActive = activeNodeId === node.id;
 
   const keyword = nodeKeyword(node);
-  const indentClass = depth > 0 ? `pl-6` : "";
+  const indentClass = depth > 0 ? `pl-3 sm:pl-6` : "";
 
   function handleClick() {
     onActivate(node.id);
@@ -152,7 +152,7 @@ function OutlineNode({
         onKeyDown={handleKeyDown}
         className={[
           "group flex items-center gap-1.5 py-1 pr-2 rounded-md cursor-pointer",
-          "text-sm select-none",
+          "text-xs sm:text-sm select-none",
           "hover:bg-[var(--bg-secondary)] transition-colors duration-100",
           isFolder
             ? "font-medium text-[var(--text)]"

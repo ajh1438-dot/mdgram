@@ -1,6 +1,26 @@
-import HeroSection from "@/components/hero/HeroSection";
+"use client";
+
+import dynamic from "next/dynamic";
 import ThemeToggle from "@/components/ThemeToggle";
-import ExplorerSection from "@/components/explorer/ExplorerSection";
+
+// Dynamic imports for code splitting — heavy D3 / tree components
+const HeroSection = dynamic(() => import("@/components/hero/HeroSection"), {
+  ssr: false,
+  loading: () => (
+    <div className="relative h-screen w-full flex items-center justify-center bg-bg">
+      <span className="text-text-muted text-sm animate-pulse">로딩 중…</span>
+    </div>
+  ),
+});
+
+const ExplorerSection = dynamic(() => import("@/components/explorer/ExplorerSection"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center">
+      <span className="text-[var(--text-muted)] text-sm animate-pulse">탐색기 로딩 중…</span>
+    </div>
+  ),
+});
 
 export default function Home() {
   return (
