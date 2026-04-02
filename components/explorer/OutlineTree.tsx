@@ -76,12 +76,39 @@ const collapseVariants: Variants = {
   },
 };
 
+/* ── Derive keyword from node name ── */
+function nodeKeyword(node: FolderTreeNode): string {
+  return node.name.replace(/\.[^.]+$/, "").trim().toLowerCase();
+}
+
+/* ── Walk tree to collect breadcrumb keywords for a node id ── */
+function collectKeywordsForNode(
+  nodes: FolderTreeNode[],
+  targetId: string,
+  ancestors: string[] = []
+): string[] | null {
+  for (const node of nodes) {
+    const kw = nodeKeyword(node);
+    if (node.id === targetId) return [...ancestors, kw];
+    if (node.children?.length) {
+      const found = collectKeywordsForNode(node.children, targetId, [
+        ...ancestors,
+        kw,
+      ]);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 /* ── Single node ── */
 interface OutlineNodeProps {
   node: FolderTreeNode;
   depth: number;
   expandedFiles: Set<string>;
   onToggleFile: (id: string) => void;
+  activeNodeId: string | null;
+  onActivate: (id: string) => void;
 }
 
 function OutlineNode({
@@ -89,14 +116,31 @@ function OutlineNode({
   depth,
   expandedFiles,
   onToggleFile,
+  activeNodeId,
+  onActivate,
 }: OutlineNodeProps) {
   const [folderOpen, setFolderOpen] = useState(depth === 0);
   const hasChildren = node.children && node.children.length > 0;
   const isFile = node.type === "file";
   const isFolder = node.type === "folder";
   const isFileExpanded = expandedFiles.has(node.id);
+  const isActive = activeNodeId === node.id;
 
+  const keyword = nodeKeyword(node);
   const indentClass = depth > 0 ? `pl-6` : "";
+
+  function handleClick() {
+    onActivate(node.id);
+    if (isFolder) setFolderOpen((p) => !p);
+    else if (isFile) onToggleFile(node.id);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
+  }
 
   return (
     <div className={indentClass}>
@@ -104,28 +148,22 @@ function OutlineNode({
       <div
         role={isFolder ? "button" : undefined}
         tabIndex={0}
-        onClick={() => {
-          if (isFolder) setFolderOpen((p) => !p);
-          else if (isFile) onToggleFile(node.id);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            if (isFolder) setFolderOpen((p) => !p);
-            else if (isFile) onToggleFile(node.id);
-          }
-        }}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
         className={[
           "group flex items-center gap-1.5 py-1 pr-2 rounded-md cursor-pointer",
           "text-sm select-none",
           "hover:bg-[var(--bg-secondary)] transition-colors duration-100",
-          isFolder ? "font-medium text-[var(--text)]" : "text-[var(--text-muted)] hover:text-[var(--text)]",
+          isFolder
+            ? "font-medium text-[var(--text)]"
+            : "text-[var(--text-muted)] hover:text-[var(--text)]",
+          isActive ? "bg-[var(--bg-secondary)]" : "",
         ].join(" ")}
       >
         {isFolder && <ChevronIcon open={folderOpen} />}
         {isFolder ? <FolderIcon open={folderOpen} /> : <FileIcon />}
-        <span className="truncate">{node.name}</span>
-        <ReactionBadge node_id={node.id} keyword={node.name} />
+        <span className="truncate flex-1">{node.name}</span>
+        <ReactionBadge node_id={node.id} keyword={keyword} />
       </div>
 
       {/* File accordion — markdown content */}
@@ -165,6 +203,8 @@ function OutlineNode({
                 depth={depth + 1}
                 expandedFiles={expandedFiles}
                 onToggleFile={onToggleFile}
+                activeNodeId={activeNodeId}
+                onActivate={onActivate}
               />
             </motion.div>
           )}
@@ -180,6 +220,8 @@ interface OutlineTreeInnerProps {
   depth: number;
   expandedFiles: Set<string>;
   onToggleFile: (id: string) => void;
+  activeNodeId: string | null;
+  onActivate: (id: string) => void;
 }
 
 function OutlineTreeInner({
@@ -187,6 +229,8 @@ function OutlineTreeInner({
   depth,
   expandedFiles,
   onToggleFile,
+  activeNodeId,
+  onActivate,
 }: OutlineTreeInnerProps) {
   return (
     <div>
@@ -197,6 +241,8 @@ function OutlineTreeInner({
           depth={depth}
           expandedFiles={expandedFiles}
           onToggleFile={onToggleFile}
+          activeNodeId={activeNodeId}
+          onActivate={onActivate}
         />
       ))}
     </div>
@@ -206,10 +252,13 @@ function OutlineTreeInner({
 /* ── Public root component ── */
 interface OutlineTreeProps {
   nodes: FolderTreeNode[];
+  /** Called whenever the active context keywords change */
+  onContextChange?: (keywords: string[]) => void;
 }
 
-export default function OutlineTree({ nodes }: OutlineTreeProps) {
+export default function OutlineTree({ nodes, onContextChange }: OutlineTreeProps) {
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
 
   function toggleFile(id: string) {
     setExpandedFiles((prev) => {
@@ -218,6 +267,14 @@ export default function OutlineTree({ nodes }: OutlineTreeProps) {
       else next.add(id);
       return next;
     });
+  }
+
+  function handleActivate(id: string) {
+    setActiveNodeId(id);
+    if (onContextChange) {
+      const kws = collectKeywordsForNode(nodes, id) ?? [];
+      onContextChange(kws);
+    }
   }
 
   if (nodes.length === 0) {
@@ -237,6 +294,8 @@ export default function OutlineTree({ nodes }: OutlineTreeProps) {
             depth={0}
             expandedFiles={expandedFiles}
             onToggleFile={toggleFile}
+            activeNodeId={activeNodeId}
+            onActivate={handleActivate}
           />
         </div>
       ))}

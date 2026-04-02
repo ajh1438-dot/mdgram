@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FolderTreeNode } from "@/types/tree";
 import OutlineTree from "./OutlineTree";
 import MindmapMini from "./MindmapMini";
@@ -12,6 +12,11 @@ export default function ExplorerSection() {
   const [tree, setTree] = useState<FolderTreeNode[]>([]);
   const [state, setState] = useState<FetchState>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [contextKeywords, setContextKeywords] = useState<string[]>([]);
+
+  const handleContextChange = useCallback((kws: string[]) => {
+    setContextKeywords(kws);
+  }, []);
 
   useEffect(() => {
     setState("loading");
@@ -108,7 +113,7 @@ export default function ExplorerSection() {
           {/* Tree */}
           {state === "success" && (
             <div className="p-6">
-              <OutlineTree nodes={tree} />
+              <OutlineTree nodes={tree} onContextChange={handleContextChange} />
             </div>
           )}
 
@@ -117,8 +122,8 @@ export default function ExplorerSection() {
         </div>
       </div>
 
-      {/* Floating action button */}
-      <MessageFAB />
+      {/* Floating action button — passes active context keywords to modal */}
+      <MessageFAB contextKeywords={contextKeywords} />
     </section>
   );
 }
