@@ -125,7 +125,7 @@ function OutlineNode({
         {isFolder && <ChevronIcon open={folderOpen} />}
         {isFolder ? <FolderIcon open={folderOpen} /> : <FileIcon />}
         <span className="truncate">{node.name}</span>
-        <ReactionBadge count={0} />
+        <ReactionBadge node_id={node.id} keyword={node.name} />
       </div>
 
       {/* File accordion — markdown content */}
@@ -141,7 +141,7 @@ function OutlineNode({
               className="overflow-hidden"
             >
               <div className="pl-6 pb-2 border-l border-[var(--border)] ml-1.5">
-                <InlineMarkdown content={node.content} />
+                <InlineMarkdown content={node.content} fileId={node.id} />
               </div>
             </motion.div>
           )}

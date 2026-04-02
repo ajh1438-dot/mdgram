@@ -1,20 +1,65 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import CommentPopover from "@/components/social/CommentPopover";
+import CommentPanel, {
+  type Comment,
+  type SelectedRange,
+} from "@/components/social/CommentPanel";
 
 interface InlineMarkdownProps {
   content: string;
+  /** file_id used to fetch and post comments */
+  fileId?: string;
   /** Optional highlight IDs for future comment highlight feature */
   highlightIds?: string[];
 }
 
 export default function InlineMarkdown({
   content,
+  fileId,
   highlightIds: _highlightIds,
 }: InlineMarkdownProps) {
-  return (
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [selectedRange, setSelectedRange] = useState<SelectedRange | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  // Fetch all comments for this file so we can show highlights
+  const fetchComments = useCallback(async () => {
+    if (!fileId) return;
+    try {
+      const res = await fetch(`/api/comments?file_id=${encodeURIComponent(fileId)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setComments(data as Comment[]);
+    } catch {
+      // silent — highlights are best-effort
+    }
+  }, [fileId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
+
+  const handleRequestComment = useCallback((range: SelectedRange) => {
+    setSelectedRange(range);
+    setPanelOpen(true);
+  }, []);
+
+  const handleClosePanel = useCallback(() => {
+    setPanelOpen(false);
+    // Refresh highlights after panel closes (new comment may have been added)
+    fetchComments();
+  }, [fetchComments]);
+
+  // Build a simple map of commented ranges for potential highlight use
+  // (kept for future use; CommentHighlight integration lives in OutlineTree)
+  void comments;
+
+  const markdownContent = (
     <div className="inline-md mt-2 text-sm leading-7 text-[var(--text)]">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
@@ -109,5 +154,25 @@ export default function InlineMarkdown({
         {content}
       </ReactMarkdown>
     </div>
+  );
+
+  // If no fileId, render plain markdown without comment features
+  if (!fileId) {
+    return markdownContent;
+  }
+
+  return (
+    <>
+      <CommentPopover onRequestComment={handleRequestComment}>
+        {markdownContent}
+      </CommentPopover>
+
+      <CommentPanel
+        open={panelOpen}
+        fileId={fileId}
+        selectedRange={selectedRange}
+        onClose={handleClosePanel}
+      />
+    </>
   );
 }
