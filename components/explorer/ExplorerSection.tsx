@@ -5,6 +5,7 @@ import { FolderTreeNode } from "@/types/tree";
 import OutlineTree from "./OutlineTree";
 import MindmapMini from "./MindmapMini";
 import MessageFAB from "./MessageFAB";
+import VisitorPostForm from "@/components/social/VisitorPostForm";
 
 type FetchState = "idle" | "loading" | "success" | "error";
 
@@ -18,7 +19,7 @@ export default function ExplorerSection() {
     setContextKeywords(kws);
   }, []);
 
-  useEffect(() => {
+  const loadTree = useCallback(() => {
     setState("loading");
     fetch("/api/tree")
       .then((res) => {
@@ -34,6 +35,10 @@ export default function ExplorerSection() {
         setState("error");
       });
   }, []);
+
+  useEffect(() => {
+    loadTree();
+  }, [loadTree]);
 
   return (
     <section
@@ -92,17 +97,7 @@ export default function ExplorerSection() {
                 <p className="text-xs text-red-400 font-mono">{errorMsg}</p>
               )}
               <button
-                onClick={() => {
-                  setState("loading");
-                  setErrorMsg("");
-                  fetch("/api/tree")
-                    .then((r) => r.json())
-                    .then((d) => { setTree(d); setState("success"); })
-                    .catch((e: unknown) => {
-                      setErrorMsg(e instanceof Error ? e.message : String(e));
-                      setState("error");
-                    });
-                }}
+                onClick={() => { setErrorMsg(""); loadTree(); }}
                 className="mt-2 text-xs px-4 py-1.5 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
               >
                 다시 시도
@@ -121,6 +116,9 @@ export default function ExplorerSection() {
           {state === "idle" && null}
         </div>
       </div>
+
+      {/* Visitor post form */}
+      <VisitorPostForm onPostCreated={loadTree} />
 
       {/* Floating action button — passes active context keywords to modal */}
       <MessageFAB contextKeywords={contextKeywords} />

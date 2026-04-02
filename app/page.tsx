@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import ThemeToggle from "@/components/ThemeToggle";
+import SettingsPanel from "@/components/SettingsPanel";
 
 // Dynamic imports for code splitting — heavy D3 / tree components
 const HeroSection = dynamic(() => import("@/components/hero/HeroSection"), {
@@ -25,9 +25,9 @@ const ExplorerSection = dynamic(() => import("@/components/explorer/ExplorerSect
 export default function Home() {
   return (
     <>
-      {/* Fixed ThemeToggle in top-right corner */}
+      {/* Fixed Settings gear in top-right corner */}
       <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
+        <SettingsPanel />
       </div>
 
       {/* Hero — fullscreen */}

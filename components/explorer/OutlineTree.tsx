@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { FolderTreeNode } from "@/types/tree";
 import InlineMarkdown from "./InlineMarkdown";
+import InlineEditor from "./InlineEditor";
 import ReactionBadge from "./ReactionBadge";
 
 /* ── Icons ── */
@@ -62,6 +63,21 @@ function FileIcon() {
   );
 }
 
+function PencilIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className="w-3 h-3"
+      aria-hidden="true"
+    >
+      <path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" />
+      <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" />
+    </svg>
+  );
+}
+
 /* ── Collapse animation variants ── */
 const collapseVariants: Variants = {
   open: {
@@ -109,6 +125,11 @@ interface OutlineNodeProps {
   onToggleFile: (id: string) => void;
   activeNodeId: string | null;
   onActivate: (id: string) => void;
+  isAdmin: boolean;
+  editingFileId: string | null;
+  onStartEdit: (id: string) => void;
+  onEndEdit: (id: string, newContent?: string) => void;
+  nodeContents: Record<string, string>;
 }
 
 function OutlineNode({
@@ -118,6 +139,11 @@ function OutlineNode({
   onToggleFile,
   activeNodeId,
   onActivate,
+  isAdmin,
+  editingFileId,
+  onStartEdit,
+  onEndEdit,
+  nodeContents,
 }: OutlineNodeProps) {
   const [folderOpen, setFolderOpen] = useState(depth === 0);
   const hasChildren = node.children && node.children.length > 0;
@@ -125,9 +151,13 @@ function OutlineNode({
   const isFolder = node.type === "folder";
   const isFileExpanded = expandedFiles.has(node.id);
   const isActive = activeNodeId === node.id;
+  const isEditing = editingFileId === node.id;
 
   const keyword = nodeKeyword(node);
   const indentClass = depth > 0 ? `pl-3 sm:pl-6` : "";
+
+  // Current content (may have been edited)
+  const currentContent = nodeContents[node.id] ?? node.content ?? "";
 
   function handleClick() {
     onActivate(node.id);
@@ -140,6 +170,13 @@ function OutlineNode({
       e.preventDefault();
       handleClick();
     }
+  }
+
+  function handleEditClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    // Expand the file if not already
+    if (!isFileExpanded) onToggleFile(node.id);
+    onStartEdit(node.id);
   }
 
   return (
@@ -164,10 +201,26 @@ function OutlineNode({
         {isFolder ? <FolderIcon open={folderOpen} /> : <FileIcon />}
         <span className="truncate flex-1">{node.name}</span>
         <ReactionBadge node_id={node.id} keyword={keyword} />
+        {/* Admin edit pencil for files */}
+        {isAdmin && isFile && (
+          <button
+            onClick={handleEditClick}
+            aria-label={`${node.name} 편집`}
+            title="인라인 편집"
+            className={[
+              "ml-1 p-1 rounded transition-colors",
+              isEditing
+                ? "text-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_15%,transparent)]"
+                : "opacity-0 group-hover:opacity-100 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-secondary)]",
+            ].join(" ")}
+          >
+            <PencilIcon />
+          </button>
+        )}
       </div>
 
-      {/* File accordion — markdown content */}
-      {isFile && node.content && (
+      {/* File accordion — markdown content or inline editor */}
+      {isFile && (
         <AnimatePresence initial={false}>
           {isFileExpanded && (
             <motion.div
@@ -179,7 +232,18 @@ function OutlineNode({
               className="overflow-hidden"
             >
               <div className="pl-6 pb-2 border-l border-[var(--border)] ml-1.5">
-                <InlineMarkdown content={node.content} fileId={node.id} />
+                {isEditing ? (
+                  <InlineEditor
+                    fileId={node.id}
+                    initialContent={currentContent}
+                    onSave={(newContent) => onEndEdit(node.id, newContent)}
+                    onCancel={() => onEndEdit(node.id)}
+                  />
+                ) : (
+                  currentContent && (
+                    <InlineMarkdown content={currentContent} fileId={node.id} />
+                  )
+                )}
               </div>
             </motion.div>
           )}
@@ -205,6 +269,11 @@ function OutlineNode({
                 onToggleFile={onToggleFile}
                 activeNodeId={activeNodeId}
                 onActivate={onActivate}
+                isAdmin={isAdmin}
+                editingFileId={editingFileId}
+                onStartEdit={onStartEdit}
+                onEndEdit={onEndEdit}
+                nodeContents={nodeContents}
               />
             </motion.div>
           )}
@@ -222,6 +291,11 @@ interface OutlineTreeInnerProps {
   onToggleFile: (id: string) => void;
   activeNodeId: string | null;
   onActivate: (id: string) => void;
+  isAdmin: boolean;
+  editingFileId: string | null;
+  onStartEdit: (id: string) => void;
+  onEndEdit: (id: string, newContent?: string) => void;
+  nodeContents: Record<string, string>;
 }
 
 function OutlineTreeInner({
@@ -231,6 +305,11 @@ function OutlineTreeInner({
   onToggleFile,
   activeNodeId,
   onActivate,
+  isAdmin,
+  editingFileId,
+  onStartEdit,
+  onEndEdit,
+  nodeContents,
 }: OutlineTreeInnerProps) {
   return (
     <div>
@@ -243,6 +322,11 @@ function OutlineTreeInner({
           onToggleFile={onToggleFile}
           activeNodeId={activeNodeId}
           onActivate={onActivate}
+          isAdmin={isAdmin}
+          editingFileId={editingFileId}
+          onStartEdit={onStartEdit}
+          onEndEdit={onEndEdit}
+          nodeContents={nodeContents}
         />
       ))}
     </div>
@@ -259,6 +343,20 @@ interface OutlineTreeProps {
 export default function OutlineTree({ nodes, onContextChange }: OutlineTreeProps) {
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [editingFileId, setEditingFileId] = useState<string | null>(null);
+  // Track locally edited content so edits persist while tree is open
+  const [nodeContents, setNodeContents] = useState<Record<string, string>>({});
+
+  // Check admin status
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d: { authenticated?: boolean }) => {
+        setIsAdmin(d.authenticated === true);
+      })
+      .catch(() => setIsAdmin(false));
+  }, []);
 
   function toggleFile(id: string) {
     setExpandedFiles((prev) => {
@@ -274,6 +372,17 @@ export default function OutlineTree({ nodes, onContextChange }: OutlineTreeProps
     if (onContextChange) {
       const kws = collectKeywordsForNode(nodes, id) ?? [];
       onContextChange(kws);
+    }
+  }
+
+  function handleStartEdit(id: string) {
+    setEditingFileId(id);
+  }
+
+  function handleEndEdit(id: string, newContent?: string) {
+    setEditingFileId(null);
+    if (newContent !== undefined) {
+      setNodeContents((prev) => ({ ...prev, [id]: newContent }));
     }
   }
 
@@ -296,6 +405,11 @@ export default function OutlineTree({ nodes, onContextChange }: OutlineTreeProps
             onToggleFile={toggleFile}
             activeNodeId={activeNodeId}
             onActivate={handleActivate}
+            isAdmin={isAdmin}
+            editingFileId={editingFileId}
+            onStartEdit={handleStartEdit}
+            onEndEdit={handleEndEdit}
+            nodeContents={nodeContents}
           />
         </div>
       ))}
