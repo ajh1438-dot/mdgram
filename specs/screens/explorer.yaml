@@ -1,0 +1,109 @@
+version: "2.0"
+
+screen:
+  name: 탐색기 (인라인 폴더트리 + 마크다운)
+  route: "/#explore"
+  layout: single-column-outline
+  description: |
+    폴더트리와 마크다운이 하나로 통합된 아웃라인 뷰.
+    폴더를 펼치면 하위 파일 목록, 파일을 클릭하면 제목 바로 아래에 마크다운 콘텐츠가 펼쳐짐.
+    사이드바 + 리더 분리가 아닌, 트리 자체가 콘텐츠를 품는 구조.
+
+data_requirements:
+  - resource: folder_tree
+    needs: [id, name, type, parent_id, order, content]
+    purpose: 전체 트리 구조 + 파일의 마크다운 콘텐츠
+  - resource: comment
+    needs: [id, selected_text, offset_start, offset_end, content, author_name, created_at]
+    filters: { file_id: "펼쳐진 파일 id" }
+    purpose: 펼쳐진 파일의 댓글 하이라이트 표시
+  - resource: reaction
+    needs: [keyword, node_id]
+    purpose: 키워드별 반응 카운트
+  - resource: theme
+    needs: [css_variables]
+    filters: { is_active: true }
+
+components:
+  - id: outline_tree
+    type: outline
+    position: main
+    function: |
+      폴더/파일이 아웃라인으로 펼쳐지는 통합 뷰.
+      - 폴더: 클릭하면 하위 항목 접기/펼치기
+      - 파일: 클릭하면 제목 바로 아래에 마크다운 콘텐츠가 아코디언으로 펼쳐짐
+      - 한 번에 여러 파일을 펼칠 수 있음 (또는 하나만 — Taste Decision)
+    data_source:
+      resource: folder_tree
+    features:
+      - 폴더 아이콘 + 파일 아이콘 구분
+      - 들여쓰기로 계층 표현
+      - 펼쳐진 파일 아래 마크다운이 자연스럽게 이어짐
+      - 각 폴더/파일명 옆에 반응 카운트 뱃지
+
+  - id: inline_markdown
+    type: markdown
+    position: inline-below-title
+    function: |
+      파일 제목 바로 아래에 렌더링되는 마크다운 콘텐츠.
+      옵시디언 스타일, 댓글 하이라이트 포함.
+    data_source:
+      resource: folder_tree
+      field: content
+    features:
+      - GFM (테이블, 체크박스, 코드블록)
+      - 이미지 임베드
+      - 댓글 달린 문장 하이라이트 표시
+      - 텍스트 선택 시 댓글 팝오버
+
+  - id: reaction_button
+    type: button
+    position: inline-beside-title
+    function: 폴더/파일명 옆 "관심 있어요" 버튼 + 카운트
+    data_source:
+      resource: reaction
+
+  - id: mindmap_mini
+    type: toggle-panel
+    position: top-right-floating
+    function: 현재 펼쳐진 위치를 마인드맵에서 하이라이트하는 미니뷰
+    data_source:
+      resource: folder_tree
+
+  - id: message_fab
+    type: fab
+    position: bottom-right-floating
+    function: "이 주제로 메시지 보내기" 플로팅 버튼 → 주제 메시지 모달 오픈
+
+events:
+  - trigger: 폴더 클릭
+    action: 하위 항목 접기/펼치기 토글
+  - trigger: 파일 제목 클릭
+    action: 제목 아래에 마크다운 콘텐츠 아코디언 펼침/접힘
+  - trigger: 반응 버튼 클릭
+    action: 반응 카운트 +1 (visitor_hash로 중복 방지)
+  - trigger: 펼쳐진 마크다운 내 텍스트 선택 (드래그)
+    action: 댓글 팝오버 표시
+  - trigger: 댓글 하이라이트 클릭
+    action: 댓글 패널 슬라이드 오픈
+  - trigger: 메시지 FAB 클릭
+    action: 주제 메시지 모달 오픈 (현재 펼쳐진 파일의 키워드 자동 태그)
+
+mobile:
+  outline_tree: 전체 화면, 들여쓰기 축소
+  inline_markdown: 파일 아래 풀 너비로 펼침
+  mindmap_mini: 숨김
+
+tests:
+  - name: 파일 콘텐츠 펼침
+    when: "건강" 폴더 펼친 후 "30kg_다이어트.md" 클릭
+    then: [제목 아래에 마크다운 콘텐츠 아코디언 펼침, 다른 펼쳐진 파일은 유지]
+  - name: 문장 선택
+    when: 펼쳐진 마크다운에서 "인슐린을 줄이기 위해" 텍스트 드래그
+    then: [댓글 팝오버 표시]
+  - name: 키워드 반응
+    when: "건강" 폴더 옆 "관심 있어요" 클릭
+    then: [카운트 +1]
+  - name: 접기
+    when: 펼쳐진 파일 제목 다시 클릭
+    then: [마크다운 콘텐츠 접힘]

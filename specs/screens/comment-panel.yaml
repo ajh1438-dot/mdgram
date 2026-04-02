@@ -1,0 +1,57 @@
+version: "2.0"
+
+screen:
+  name: 문장 선택 댓글 패널
+  route: (explorer 내 슬라이드 패널)
+  layout: slide-panel-right
+  description: 특정 문장에 대한 댓글 작성/조회
+
+data_requirements:
+  - resource: comment
+    needs: [id, selected_text, content, author_name, created_at]
+    filters: { file_id: "현재 파일", offset_start: "선택 범위" }
+
+components:
+  - id: selected_text_highlight
+    type: text
+    position: panel-top
+    function: 선택된 문장을 하이라이트로 표시
+
+  - id: comment_list
+    type: list
+    position: panel-body
+    function: 해당 문장의 댓글 목록 (시간순)
+    data_source:
+      resource: comment
+
+  - id: comment_form
+    type: form
+    position: panel-bottom
+    function: 댓글 작성
+    fields:
+      - name: author_name
+        type: text
+        label: 닉네임 (선택)
+        required: false
+      - name: content
+        type: textarea
+        label: 댓글
+        required: true
+    submit_label: 댓글 달기
+
+events:
+  - trigger: 댓글 제출
+    action: Supabase에 댓글 저장 → 목록 갱신 → 마크다운 리더에 하이라이트 추가
+  - trigger: 패널 외부 클릭 또는 X 버튼
+    action: 패널 닫기
+
+tests:
+  - name: 댓글 작성
+    when: 닉네임 "민수" + 내용 "저도 이거 해봤어요!" 입력 후 제출
+    then: [댓글 목록에 추가, 마크다운에서 해당 문장 하이라이트]
+  - name: 기존 댓글 조회
+    when: 하이라이트된 문장 클릭
+    then: [패널 열림, 기존 댓글들 시간순 표시]
+  - name: 빈 댓글 방지
+    when: 내용 없이 제출
+    then: [에러 표시, 제출 안 됨]

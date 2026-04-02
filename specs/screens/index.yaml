@@ -1,0 +1,32 @@
+version: "2.0"
+
+screens:
+  - id: hero
+    name: Hero (메인 상단)
+    route: /
+    file: hero.yaml
+
+  - id: explorer
+    name: 탐색기 (폴더트리 + 마크다운 리더)
+    route: "/#explore"
+    file: explorer.yaml
+
+  - id: comment-panel
+    name: 문장 선택 댓글 패널
+    route: (explorer 내 오버레이)
+    file: comment-panel.yaml
+
+  - id: topic-message
+    name: 주제 기반 메시지
+    route: (explorer 내 모달)
+    file: topic-message.yaml
+
+  - id: admin-editor
+    name: 관리자 — 폴더/파일 관리
+    route: /admin
+    file: admin-editor.yaml
+
+  - id: admin-dashboard
+    name: 관리자 — 대시보드
+    route: /admin/dashboard
+    file: admin-dashboard.yaml

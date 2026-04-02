@@ -1,0 +1,91 @@
+version: "2.0"
+
+screen:
+  name: 관리자 — 폴더/파일 관리
+  route: /admin
+  layout: sidebar-main
+  auth: required (Supabase Auth)
+  description: 폴더트리 CRUD + 마크다운 에디터 + 실시간 프리뷰
+
+data_requirements:
+  - resource: folder_tree
+    needs: [id, name, type, parent_id, order, content]
+    purpose: 전체 트리 CRUD
+  - resource: theme
+    needs: [id, name, css_variables, is_active]
+    purpose: 테마 선택/프리뷰
+
+components:
+  - id: admin_tree
+    type: tree
+    position: sidebar
+    function: 폴더트리 관리 (드래그&드롭 이동, 우클릭 메뉴)
+    data_source:
+      resource: folder_tree
+    features:
+      - 드래그&드롭으로 순서/위치 변경
+      - 우클릭 → 새 폴더, 새 파일, 이름 변경, 삭제
+      - 폴더 통째로 드래그하여 이동
+
+  - id: admin_toolbar
+    type: toolbar
+    position: top
+    function: 새 폴더, 새 파일, 삭제, 저장 버튼
+    actions:
+      - new_folder: 선택된 위치에 새 폴더 생성
+      - new_file: 선택된 폴더에 새 .md 파일 생성
+      - delete: 선택된 항목 삭제 (확인 모달)
+      - save: 현재 편집 중인 파일 저장
+
+  - id: markdown_editor
+    type: editor
+    position: main-left
+    function: 마크다운 에디터 (CodeMirror 또는 Monaco)
+    data_source:
+      resource: folder_tree
+      field: content
+    features:
+      - 마크다운 문법 하이라이트
+      - 자동 저장 (debounced, 2초)
+      - 이미지 드래그&드롭 업로드 (Supabase Storage)
+
+  - id: preview_pane
+    type: markdown
+    position: main-right
+    function: 실시간 마크다운 프리뷰 (에디터 입력 시 즉시 반영)
+    data_source:
+      resource: folder_tree
+      field: content
+
+  - id: theme_selector
+    type: dropdown
+    position: top-right
+    function: 테마 선택 (프리뷰에 즉시 반영)
+    data_source:
+      resource: theme
+
+events:
+  - trigger: 폴더/파일 드래그&드롭
+    action: folder_tree 순서/위치 업데이트 → Supabase 저장 → 마인드맵 자동 반영
+  - trigger: 파일 선택
+    action: 에디터에 마크다운 콘텐츠 로드
+  - trigger: 에디터 입력
+    action: 프리뷰 실시간 갱신 + 2초 디바운스 자동 저장
+  - trigger: 삭제
+    action: 확인 모달 → Supabase 삭제 → 트리 갱신
+  - trigger: 테마 선택
+    action: 프리뷰 테마 변경 + is_active 업데이트
+
+tests:
+  - name: 폴더 생성
+    when: 툴바에서 "새 폴더" 클릭
+    then: [트리에 새 폴더 추가, 이름 입력 모드, Supabase에 저장]
+  - name: 파일 편집
+    when: "건강/30kg_다이어트.md" 선택 후 에디터에 텍스트 입력
+    then: [프리뷰 실시간 반영, 2초 후 자동 저장]
+  - name: 드래그&드롭 이동
+    when: "영성" 폴더를 "과학" 폴더 아래로 드래그
+    then: [트리 구조 변경, Supabase 업데이트, 메인 페이지 마인드맵 반영]
+  - name: 인증 필요
+    when: 비로그인 상태로 /admin 접근
+    then: [로그인 페이지로 리다이렉트]

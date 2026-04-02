@@ -1,0 +1,72 @@
+version: "2.0"
+
+screen:
+  name: 관리자 — 대시보드
+  route: /admin/dashboard
+  layout: single-column
+  auth: required (Supabase Auth)
+  description: 반응/댓글/메시지 관리 + 키워드 통계
+
+data_requirements:
+  - resource: reaction
+    needs: [keyword, node_id, created_at]
+    purpose: 키워드별 반응 통계
+  - resource: comment
+    needs: [id, file_id, selected_text, content, author_name, created_at]
+    purpose: 최근 댓글 목록 관리
+  - resource: message
+    needs: [id, keyword_tags, content, sender_name, sender_email, is_read, created_at]
+    purpose: 메시지 인박스
+  - resource: folder_tree
+    needs: [id, name]
+    purpose: 파일명 표시 (댓글의 file_id 매핑)
+
+components:
+  - id: reaction_chart
+    type: bar-chart
+    position: top
+    function: 키워드별 반응 수 바 차트
+    data_source:
+      resource: reaction
+      aggregation: count by keyword
+
+  - id: recent_comments
+    type: list
+    position: middle
+    function: 최근 댓글 목록 (파일명 + 선택 문장 + 댓글 내용)
+    data_source:
+      resource: comment
+    features:
+      - 파일명 표시 (folder_tree.name 조인)
+      - 선택 문장 하이라이트 미리보기
+      - 삭제 버튼
+
+  - id: message_inbox
+    type: grouped-list
+    position: bottom
+    function: 키워드 태그별 그룹화된 메시지 인박스
+    data_source:
+      resource: message
+    features:
+      - 읽음/안읽음 표시
+      - 키워드 태그 필터
+      - 답장 링크 (sender_email이 있는 경우)
+
+events:
+  - trigger: 댓글 삭제 클릭
+    action: 확인 → Supabase 삭제 → 목록 갱신
+  - trigger: 메시지 클릭
+    action: is_read = true 업데이트 → 상세 내용 확장
+  - trigger: 키워드 태그 필터 선택
+    action: 해당 키워드의 메시지만 필터링
+
+tests:
+  - name: 반응 통계
+    when: 대시보드 접속
+    then: [키워드별 반응 수 차트 표시, "건강" 키워드가 가장 높으면 첫 번째]
+  - name: 댓글 관리
+    when: 댓글 삭제 버튼 클릭
+    then: [확인 모달, 삭제 후 목록에서 제거]
+  - name: 메시지 읽음 처리
+    when: 안읽은 메시지 클릭
+    then: [읽음 표시로 변경, 상세 내용 확장]

@@ -1,0 +1,79 @@
+version: "2.0"
+
+screen:
+  name: Hero (메인 상단)
+  route: /
+  layout: fullscreen
+  description: 세계관 전달 + 마인드맵 배경 + 탐색 유도
+
+data_requirements:
+  - resource: site_config
+    needs: [hero_title, hero_subtitle, hero_copy, owner_name]
+  - resource: folder_tree
+    needs: [id, name, type, parent_id]
+    filters: { type: "folder", parent_id: null }
+    purpose: 마인드맵 1레벨 노드 생성
+  - resource: theme
+    needs: [name, css_variables]
+    filters: { is_active: true }
+
+components:
+  - id: hero_background
+    type: canvas
+    position: fullscreen-bg
+    function: D3.js 마인드맵이 은은하게 표시되는 인터랙티브 배경
+    data_source:
+      resource: folder_tree
+
+  - id: hero_title
+    type: text
+    position: center
+    function: 사이트 타이틀 표시 ("연결의 숲")
+    data_source:
+      resource: site_config
+      field: hero_title
+
+  - id: hero_subtitle
+    type: text
+    position: center-below-title
+    function: 소유자 한 줄 서사 표시
+    data_source:
+      resource: site_config
+      field: hero_subtitle
+
+  - id: hero_copy
+    type: text
+    position: center-below-subtitle
+    function: 한 줄 카피 표시
+    data_source:
+      resource: site_config
+      field: hero_copy
+
+  - id: theme_toggle
+    type: button
+    position: top-right
+    function: CSS 테마 전환 (라이트/다크/포레스트)
+
+  - id: scroll_cta
+    type: button
+    position: bottom-center
+    function: "숲을 탐색하기" 스크롤 유도 화살표
+
+events:
+  - trigger: 마인드맵 노드 클릭
+    action: 탐색기로 스크롤 + 해당 폴더/파일 선택
+  - trigger: 스크롤 다운
+    action: Hero 페이드아웃 → 탐색기 진입
+  - trigger: 테마 토글 클릭
+    action: CSS data-theme 변경 → 전체 페이지 + 마인드맵 동시 반영
+
+tests:
+  - name: 초기 로드
+    when: 페이지 접속
+    then: [타이틀/서브타이틀/카피 표시, 마인드맵 배경 렌더링, 테마 토글 표시]
+  - name: 마인드맵 노드 클릭
+    when: "건강" 노드 클릭
+    then: [탐색기로 스크롤, "건강" 폴더 선택됨]
+  - name: 테마 전환
+    when: 테마 토글 클릭
+    then: [전체 색상 변경, 마인드맵 색상도 동기 변경, localStorage에 저장]

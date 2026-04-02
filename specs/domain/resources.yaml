@@ -1,0 +1,66 @@
+version: "2.0"
+
+resources:
+  folder_tree:
+    description: 폴더트리 구조 (Single Source of Truth)
+    fields:
+      - id: uuid
+      - name: string
+      - type: enum(folder, file)
+      - parent_id: uuid | null
+      - order: integer
+      - content: text | null  # 마크다운 콘텐츠 (file인 경우)
+      - created_at: timestamp
+      - updated_at: timestamp
+    relations:
+      - children: folder_tree[]  # 재귀 구조
+
+  comment:
+    description: 문장 선택 댓글
+    fields:
+      - id: uuid
+      - file_id: uuid  # folder_tree.id (type=file)
+      - selected_text: string
+      - offset_start: integer
+      - offset_end: integer
+      - content: text
+      - author_name: string
+      - created_at: timestamp
+
+  reaction:
+    description: 키워드(노드) 반응
+    fields:
+      - id: uuid
+      - keyword: string  # 폴더/파일 이름
+      - node_id: uuid  # folder_tree.id
+      - visitor_hash: string  # 익명 해시 (중복 방지)
+      - created_at: timestamp
+
+  message:
+    description: 주제 기반 메시지
+    fields:
+      - id: uuid
+      - keyword_tags: string[]
+      - content: text
+      - sender_name: string
+      - sender_email: string | null
+      - is_read: boolean
+      - created_at: timestamp
+
+  theme:
+    description: CSS 테마 설정
+    fields:
+      - id: uuid
+      - name: string
+      - css_variables: jsonb  # { "--bg": "#000", "--text": "#fff", ... }
+      - is_active: boolean
+      - is_builtin: boolean
+
+  site_config:
+    description: 사이트 전역 설정 (Hero 카피 등)
+    fields:
+      - id: uuid
+      - hero_title: string
+      - hero_subtitle: string
+      - hero_copy: text
+      - owner_name: string

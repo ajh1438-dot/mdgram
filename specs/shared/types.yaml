@@ -1,0 +1,69 @@
+version: "2.0"
+
+types:
+  FolderTreeNode:
+    id: string
+    name: string
+    type: "folder" | "file"
+    parent_id: string | null
+    order: number
+    content: string | null
+    children: FolderTreeNode[]
+
+  Comment:
+    id: string
+    file_id: string
+    selected_text: string
+    offset_start: number
+    offset_end: number
+    content: string
+    author_name: string
+    created_at: string
+
+  CommentHighlight:
+    comment_id: string
+    offset_start: number
+    offset_end: number
+    comment_count: number
+
+  Reaction:
+    id: string
+    keyword: string
+    node_id: string
+    visitor_hash: string
+    created_at: string
+
+  ReactionCount:
+    keyword: string
+    node_id: string
+    count: number
+
+  Message:
+    id: string
+    keyword_tags: string[]
+    content: string
+    sender_name: string
+    sender_email: string | null
+    is_read: boolean
+    created_at: string
+
+  Theme:
+    id: string
+    name: string
+    css_variables: Record<string, string>
+    is_active: boolean
+    is_builtin: boolean
+
+  SiteConfig:
+    id: string
+    hero_title: string
+    hero_subtitle: string
+    hero_copy: string
+    owner_name: string
+
+  ThemeConfig:
+    bg: string
+    text: string
+    accent: string
+    surface: string
+    node_colors: string[]

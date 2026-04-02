@@ -1,0 +1,57 @@
+version: "2.0"
+
+shared_components:
+  outline_tree:
+    description: 폴더/파일이 아웃라인으로 펼쳐지는 통합 뷰 (파일 클릭 시 제목 아래에 마크다운 인라인 표시)
+    used_in: [explorer]
+    props:
+      - items: FolderTreeNode[]
+      - expanded_ids: string[] (펼쳐진 폴더/파일 id 목록)
+      - on_toggle: (node_id) => void
+      - show_reactions: boolean
+
+  folder_tree_admin:
+    description: 관리자용 드래그&드롭 폴더트리
+    used_in: [admin-editor]
+    props:
+      - items: FolderTreeNode[]
+      - selected_id: string | null
+      - on_select: (node) => void
+      - draggable: true
+
+  markdown_reader:
+    description: 옵시디언 스타일 마크다운 렌더링
+    used_in: [explorer, admin-editor(preview)]
+    props:
+      - content: string (마크다운 텍스트)
+      - highlights: CommentHighlight[] (댓글 위치)
+      - on_text_select: (selection) => void
+      - on_highlight_click: (comment_id) => void
+      - theme: ThemeConfig
+
+  mindmap:
+    description: D3.js 인터랙티브 마인드맵
+    used_in: [hero(fullscreen), explorer(mini)]
+    props:
+      - nodes: FolderTreeNode[] (폴더구조에서 변환)
+      - reactions: ReactionCount[] (노드별 반응 수)
+      - on_node_click: (node_id) => void
+      - mode: "fullscreen" | "mini"
+      - theme: ThemeConfig
+
+  theme_toggle:
+    description: CSS 테마 전환 버튼
+    used_in: [hero, explorer, admin-editor]
+    props:
+      - themes: Theme[]
+      - active_theme: string
+      - on_change: (theme_name) => void
+
+  comment_popover:
+    description: 텍스트 선택 시 나타나는 댓글 작성 팝오버
+    used_in: [explorer]
+    props:
+      - selected_text: string
+      - position: { x, y }
+      - on_submit: (comment) => void
+      - on_cancel: () => void
