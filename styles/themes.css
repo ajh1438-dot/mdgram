@@ -1,0 +1,40 @@
+/* ============================================================
+   CSS Theme System — 연결의 숲
+   Three themes: dark (default) | light | forest
+   ============================================================ */
+
+/* ── Dark (default) ── */
+[data-theme="dark"] {
+  --bg:           #0a0a0a;
+  --bg-secondary: #111111;
+  --text:         #e4e4e7;
+  --text-muted:   #71717a;
+  --accent:       #6366f1;
+  --accent-hover: #818cf8;
+  --border:       #27272a;
+  --card:         #18181b;
+}
+
+/* ── Light ── */
+[data-theme="light"] {
+  --bg:           #fafafa;
+  --bg-secondary: #f4f4f5;
+  --text:         #18181b;
+  --text-muted:   #71717a;
+  --accent:       #4f46e5;
+  --accent-hover: #4338ca;
+  --border:       #e4e4e7;
+  --card:         #ffffff;
+}
+
+/* ── Forest ── */
+[data-theme="forest"] {
+  --bg:           #0c1a0c;
+  --bg-secondary: #112211;
+  --text:         #d4e7d4;
+  --text-muted:   #6b9e6b;
+  --accent:       #22c55e;
+  --accent-hover: #16a34a;
+  --border:       #1a3a1a;
+  --card:         #0f220f;
+}
