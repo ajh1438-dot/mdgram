@@ -110,6 +110,7 @@ const THEME_CONFIG: Record<
 interface AuthState {
   authenticated: boolean;
   email: string | null;
+  username?: string | null;
 }
 
 interface SettingsPanelProps {
@@ -411,10 +412,26 @@ export default function SettingsPanel({ onAdminSelectFile }: SettingsPanelProps)
                           </svg>
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[10px] text-[var(--text-muted)]">관리자</p>
+                          <p className="text-[10px] text-[var(--text-muted)]">
+                            {auth.username ? `@${auth.username}` : "관리자"}
+                          </p>
                           <p className="text-xs text-[var(--text)] truncate">{auth.email}</p>
                         </div>
                       </div>
+
+                      {/* My page link */}
+                      {auth.username && (
+                        <a
+                          href={`/${auth.username}`}
+                          className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+                            <path fillRule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z" clipRule="evenodd" />
+                          </svg>
+                          내 페이지
+                        </a>
+                      )}
+
                       <button
                         onClick={handleLogout}
                         disabled={loggingOut}
@@ -425,7 +442,7 @@ export default function SettingsPanel({ onAdminSelectFile }: SettingsPanelProps)
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs text-[var(--text-muted)]">로그인하면 관리자 기능을 사용할 수 있습니다.</p>
+                      <p className="text-xs text-[var(--text-muted)]">로그인하면 나만의 숲을 만들 수 있습니다.</p>
                       <a
                         href="/login"
                         className="flex items-center justify-center gap-1.5 w-full rounded-lg bg-[var(--accent)] px-3 py-2 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] transition-colors"
@@ -435,6 +452,15 @@ export default function SettingsPanel({ onAdminSelectFile }: SettingsPanelProps)
                           <path fillRule="evenodd" d="M19 10a.75.75 0 00-.75-.75H8.704l1.048-.943a.75.75 0 10-1.004-1.114l-2.5 2.25a.75.75 0 000 1.114l2.5 2.25a.75.75 0 101.004-1.114l-1.048-.943h9.546A.75.75 0 0019 10z" clipRule="evenodd" />
                         </svg>
                         로그인
+                      </a>
+                      <a
+                        href="/signup"
+                        className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+                          <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                        </svg>
+                        회원가입
                       </a>
                     </div>
                   )}

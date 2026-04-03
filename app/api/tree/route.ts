@@ -4,13 +4,23 @@ import { buildTree } from '@/lib/tree';
 import { FolderTreeNode } from '@/types/tree';
 
 // GET /api/tree — fetch all nodes, return nested tree
-export async function GET() {
+// Optional query param: ?owner_id=xxx to filter by owner
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { searchParams } = new URL(request.url);
+  const ownerId = searchParams.get("owner_id");
+
+  let query = supabase
     .from('folder_tree')
     .select('*')
     .order('order', { ascending: true });
+
+  if (ownerId) {
+    query = query.eq('owner_id', ownerId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -23,6 +33,9 @@ export async function GET() {
 // POST /api/tree — create a new node
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
+
+  // Get the authenticated user and attach owner_id
+  const { data: { user } } = await supabase.auth.getUser();
 
   let body: unknown;
   try {
@@ -53,9 +66,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const insertPayload: Record<string, unknown> = { name, type, parent_id, order, content };
+  if (user) insertPayload.owner_id = user.id;
+
   const { data, error } = await supabase
     .from('folder_tree')
-    .insert({ name, type, parent_id, order, content })
+    .insert(insertPayload)
     .select()
     .single();
 

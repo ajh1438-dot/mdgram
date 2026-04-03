@@ -43,6 +43,7 @@ const MyCareer = dynamic(() => import("@/components/intro/MyCareer"), { ssr: fal
 const MyInterests = dynamic(() => import("@/components/intro/MyInterests"), { ssr: false });
 const BuildingProcess = dynamic(() => import("@/components/intro/BuildingProcess"), { ssr: false });
 const GuestBook = dynamic(() => import("@/components/intro/GuestBook"), { ssr: false });
+const ForestCTA = dynamic(() => import("@/components/intro/ForestCTA"), { ssr: false });
 
 export default function Home() {
   const [mode, setMode] = useState<Mode>("intro");
@@ -96,6 +97,7 @@ export default function Home() {
             <MyInterests />
             <BuildingProcess />
             <GuestBook />
+            <ForestCTA />
           </motion.div>
         ) : (
           <motion.div
