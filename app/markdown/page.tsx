@@ -21,6 +21,8 @@ const ExplorerSection = dynamic(() => import("@/components/explorer/ExplorerSect
   ),
 });
 
+const ForestCTA = dynamic(() => import("@/components/intro/ForestCTA"), { ssr: false });
+
 export default function MarkdownPage() {
   return (
     <>
@@ -42,6 +44,7 @@ export default function MarkdownPage() {
 
       <HeroSection />
       <ExplorerSection />
+      <ForestCTA />
     </>
   );
 }

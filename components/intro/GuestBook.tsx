@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { FolderTreeNode } from "@/types/tree";
-import VisitorPostForm from "@/components/social/VisitorPostForm";
 import { useInView } from "./useInView";
 
 interface Post {
@@ -160,15 +159,109 @@ export default function GuestBook() {
           </div>
         )}
 
-        {/* Post form */}
+        {/* Guestbook form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <VisitorPostForm onPostCreated={fetchPosts} />
+          <GuestbookForm onPosted={fetchPosts} />
         </motion.div>
       </div>
     </section>
+  );
+}
+
+/* ── Simple inline guestbook form ── */
+function GuestbookForm({ onPosted }: { onPosted: () => void }) {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) { setError("이름을 입력해주세요."); return; }
+    if (!message.trim()) { setError("메시지를 입력해주세요."); return; }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/tree", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${name.trim()}_소개.md`,
+          type: "file",
+          parent_id: null,
+          content: message.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error((errData as { error?: string }).error ?? "제출 실패");
+      }
+      setSuccess(true);
+      setName("");
+      setMessage("");
+      onPosted();
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+      <p className="text-sm font-semibold text-[var(--text)] mb-4">한 마디 남겨보세요</p>
+      {success && (
+        <div className="mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-600 dark:text-emerald-400">
+          메시지가 숲에 심어졌습니다!
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">
+            이름 <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="홍길동"
+            maxLength={30}
+            required
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">
+            메시지 <span className="text-red-400">*</span>
+          </label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="응원의 한 마디, 피드백, 짧은 소개 — 무엇이든 좋습니다."
+            rows={4}
+            required
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition resize-y"
+          />
+        </div>
+        {error && (
+          <p className="text-xs text-red-400">{error}</p>
+        )}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="px-5 py-2 text-xs font-semibold rounded-lg bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting ? "남기는 중…" : "남기기"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

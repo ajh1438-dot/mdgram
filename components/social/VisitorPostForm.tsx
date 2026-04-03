@@ -61,7 +61,7 @@ export default function VisitorPostForm({ onPostCreated }: VisitorPostFormProps)
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-6">
+    <div className="max-w-4xl mx-auto mt-6">
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-sm overflow-hidden">
         {/* Header / Trigger */}
         <button
