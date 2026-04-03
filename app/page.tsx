@@ -91,7 +91,7 @@ export default function Home() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
           >
-            <HeroIntro />
+            <HeroIntro onSwitchToMarkdown={() => handleModeChange("markdown")} />
             <AboutMe />
             <MyCareer />
             <MyInterests />

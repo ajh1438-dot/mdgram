@@ -17,13 +17,14 @@ interface SiteConfig {
 
 interface HeroIntroProps {
   onScrollNext?: () => void;
+  onSwitchToMarkdown?: () => void;
 }
 
-export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
+export default function HeroIntro({ onScrollNext, onSwitchToMarkdown }: HeroIntroProps) {
   const [config, setConfig] = useState<SiteConfig>({
-    hero_title: "연결의 숲",
+    hero_title: "",
     hero_subtitle: "호기심 천국에 사는\n개척정신 회계사",
-    hero_copy: "서로 관계없어 보이는 것들이 연결되는 숲에 들어와보세요",
+    hero_copy: "",
   });
 
   useEffect(() => {
@@ -61,15 +62,6 @@ export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
 
       {/* Hero text */}
       <div className="relative z-10 flex flex-col items-center text-center px-4 sm:px-6 max-w-2xl w-full">
-        <motion.div
-          className="mb-4 px-3 py-1 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold tracking-widest uppercase"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          {config.hero_title}
-        </motion.div>
-
         <motion.h1
           className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-[var(--text)] leading-tight whitespace-pre-line"
           initial={{ opacity: 0, y: 32 }}
@@ -79,26 +71,29 @@ export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
           {config.hero_subtitle}
         </motion.h1>
 
-        <motion.p
-          className="mt-5 text-base sm:text-lg md:text-xl text-[var(--text-muted)] font-medium max-w-lg"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-        >
-          {config.hero_copy}
-        </motion.p>
-
-        <motion.button
-          onClick={handleScroll}
-          className="mt-10 px-6 py-3 rounded-full bg-[var(--accent)] text-white text-sm font-semibold hover:bg-[var(--accent-hover)] transition-colors"
+        <motion.div
+          className="mt-10 flex gap-4"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
-          소개 보기
-        </motion.button>
+          <motion.button
+            onClick={handleScroll}
+            className="px-6 py-3 rounded-full bg-[var(--accent)] text-white text-sm font-semibold hover:bg-[var(--accent-hover)] transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            내 소개
+          </motion.button>
+          <motion.button
+            onClick={() => onSwitchToMarkdown?.()}
+            className="px-6 py-3 rounded-full border border-[var(--accent)] text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/10 transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            마크다운
+          </motion.button>
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}

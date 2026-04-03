@@ -76,7 +76,7 @@ export default function VisitorPostForm({ onPostCreated }: VisitorPostFormProps)
               </svg>
             </span>
             <div>
-              <p className="text-sm font-semibold text-[var(--text)]">당신도 소개글을 남겨보세요</p>
+              <p className="text-sm font-semibold text-[var(--text)]">당신의 소개도 마크다운으로 남겨보세요</p>
               <p className="text-xs text-[var(--text-muted)]">이 숲에 당신의 이야기를 심어보세요</p>
             </div>
           </div>

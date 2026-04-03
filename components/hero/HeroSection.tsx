@@ -24,8 +24,8 @@ export default function HeroSection() {
         // Fallback so Hero renders without API
         setConfig({
           hero_title: "연결의 숲",
-          hero_subtitle: "생각이 나무처럼 자라고 이야기가 숲을 이루는 곳",
-          hero_copy: "마크다운 서사 소셜 플랫폼",
+          hero_subtitle: "마크다운으로 저를 소개할게요",
+          hero_copy: "",
         });
       });
   }, []);
