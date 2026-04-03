@@ -231,7 +231,7 @@ function OutlineNode({
               exit="closed"
               className="overflow-hidden"
             >
-              <div className="pl-6 pb-2 border-l border-[var(--border)] ml-1.5">
+              <div className="pl-2 sm:pl-4 pb-2 border-l border-[var(--border)] ml-1.5">
                 {isEditing ? (
                   <InlineEditor
                     fileId={node.id}

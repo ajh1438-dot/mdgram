@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
@@ -9,30 +8,12 @@ const MindmapBackground = dynamic(() => import("@/components/hero/MindmapBackgro
   loading: () => null,
 });
 
-interface SiteConfig {
-  hero_title: string;
-  hero_subtitle: string;
-  hero_copy: string;
-}
-
 interface HeroIntroProps {
   onScrollNext?: () => void;
   onSwitchToMarkdown?: () => void;
 }
 
 export default function HeroIntro({ onScrollNext, onSwitchToMarkdown }: HeroIntroProps) {
-  const [config, setConfig] = useState<SiteConfig>({
-    hero_title: "",
-    hero_subtitle: "호기심 천국에 사는\n회계사",
-    hero_copy: "",
-  });
-
-  useEffect(() => {
-    fetch("/api/config")
-      .then((r) => r.json())
-      .then((data: SiteConfig) => setConfig(data))
-      .catch(() => {});
-  }, []);
 
   const handleScroll = () => {
     if (onScrollNext) {
@@ -68,7 +49,7 @@ export default function HeroIntro({ onScrollNext, onSwitchToMarkdown }: HeroIntr
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
         >
-          {config.hero_subtitle}
+          {"호기심 천국에 사는\n회계사"}
         </motion.h1>
 
         <motion.div

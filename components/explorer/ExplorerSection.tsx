@@ -54,6 +54,8 @@ export default function ExplorerSection() {
             </h2>
             <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
               생각의 나무를 펼쳐보세요 — 항목을 클릭하면 내용이 열립니다.
+              <br />
+              문장이나 키워드에 댓글을 달 수 있습니다.
             </p>
           </div>
           {/* Mindmap mini toggle — hidden on mobile, visible on sm+ */}
