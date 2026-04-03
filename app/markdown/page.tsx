@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import SettingsPanel from "@/components/SettingsPanel";
+import ContactFooter from "@/components/ContactFooter";
 
 const HeroSection = dynamic(() => import("@/components/hero/HeroSection"), {
   ssr: false,
@@ -45,6 +46,7 @@ export default function MarkdownPage() {
       <HeroSection />
       <ExplorerSection />
       <ForestCTA />
+      <ContactFooter />
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import SettingsPanel from "@/components/SettingsPanel";
+import ContactFooter from "@/components/ContactFooter";
 
 const HeroIntro = dynamic(() => import("@/components/intro/HeroIntro"), {
   ssr: false,
@@ -36,6 +37,7 @@ export default function Home() {
       <MyInterests />
       <BuildingProcess />
       <GuestBook />
+      <ContactFooter />
     </>
   );
 }
