@@ -183,7 +183,7 @@ function OutlineNode({
   }
 
   return (
-    <div className={`${indentClass} overflow-hidden`}>
+    <div className={`${indentClass}`}>
       {/* Row */}
       <div
         role={isFolder ? "button" : undefined}
@@ -238,9 +238,9 @@ function OutlineNode({
               initial="closed"
               animate="open"
               exit="closed"
-              className="overflow-hidden"
+              className=""
             >
-              <div className="pl-1 pb-2 ml-0">
+              <div className="pb-3 pt-1 px-0">
                 {isEditing ? (
                   <InlineEditor
                     fileId={node.id}
@@ -269,7 +269,6 @@ function OutlineNode({
               initial="closed"
               animate="open"
               exit="closed"
-              className="overflow-hidden"
             >
               <OutlineTreeInner
                 nodes={node.children!}
@@ -409,9 +408,9 @@ export default function OutlineTree({ nodes, onContextChange }: OutlineTreeProps
   }
 
   return (
-    <div className="divide-y divide-[var(--border)] overflow-hidden">
+    <div className="divide-y divide-[var(--border)]">
       {nodes.map((node) => (
-        <div key={node.id} className="py-1 overflow-hidden">
+        <div key={node.id} className="py-1">
           <OutlineNode
             node={node}
             depth={0}

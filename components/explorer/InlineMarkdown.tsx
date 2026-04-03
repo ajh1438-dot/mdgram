@@ -61,8 +61,8 @@ export default function InlineMarkdown({
 
   const markdownContent = (
     <div
-      className="inline-md mt-3 text-sm leading-7 text-[var(--text)] overflow-x-hidden whitespace-normal"
-      style={{ overflowWrap: "anywhere", wordBreak: "normal", overflowY: "visible" }}
+      className="inline-md mt-3 text-sm leading-7 text-[var(--text)] w-full"
+      style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}

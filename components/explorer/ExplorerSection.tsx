@@ -72,7 +72,7 @@ export default function ExplorerSection() {
 
       {/* Main content card */}
       <div className="max-w-4xl mx-auto">
-        <div className="glass-panel rounded-2xl shadow-sm overflow-hidden">
+        <div className="glass-panel rounded-2xl shadow-sm overflow-x-auto">
           {/* Loading */}
           {state === "loading" && (
             <div className="flex items-center justify-center py-24">
