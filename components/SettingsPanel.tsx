@@ -365,6 +365,37 @@ export default function SettingsPanel({ onAdminSelectFile }: SettingsPanelProps)
                       </svg>
                       가져오기 / 내보내기
                     </a>
+
+                    {/* Intro section management shortcuts */}
+                    <div className="mt-3 pt-3 border-t border-[var(--border)]">
+                      <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-widest mb-2">소개 페이지 섹션</p>
+                      <div className="space-y-1">
+                        {[
+                          { id: "intro-hero", label: "Hero 섹션" },
+                          { id: "intro-about", label: "내 소개" },
+                          { id: "intro-career", label: "내 커리어" },
+                          { id: "intro-interests", label: "내 관심사" },
+                          { id: "intro-process", label: "만드는 과정" },
+                          { id: "intro-guestbook", label: "후기 & 소통" },
+                        ].map(({ id, label }) => (
+                          <button
+                            key={id}
+                            onClick={() => {
+                              setOpen(false);
+                              setTimeout(() => {
+                                document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+                              }, 200);
+                            }}
+                            className="w-full text-left text-xs px-3 py-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-secondary)] transition-colors flex items-center gap-2"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 flex-shrink-0 text-[var(--accent)]">
+                              <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+                            </svg>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
 
