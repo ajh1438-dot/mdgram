@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
@@ -73,6 +74,7 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
+      // 1. Create the user via our API (uses admin API, no email verification needed)
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -87,6 +89,17 @@ export default function SignupPage() {
         return;
       }
 
+      // 2. Auto-login the newly created user
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (signInError) {
+        // Signup succeeded but auto-login failed — redirect to login page
+        router.push(`/login?signup=success&username=${json.user!.username}`);
+        return;
+      }
+
+      // 3. Redirect to their new page
       router.push(`/${json.user!.username}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "회원가입 중 오류가 발생했습니다.");

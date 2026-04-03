@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
+function getAdminClient() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 // POST /api/auth/signup
 export async function POST(request: NextRequest) {
@@ -33,10 +40,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
+  const supabaseAdmin = getAdminClient();
 
   // Check username uniqueness
-  const { data: existing } = await supabase
+  const { data: existing } = await supabaseAdmin
     .from("user_profile")
     .select("id")
     .eq("username", username)
@@ -46,10 +53,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "이미 사용 중인 사용자명입니다" }, { status: 409 });
   }
 
-  // Create auth user
-  const { data: authData, error: authError } = await supabase.auth.signUp({
+  // Create auth user via admin API with email_confirm: true (bypasses email verification)
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
+    email_confirm: true,
   });
 
   if (authError || !authData.user) {
@@ -61,37 +69,31 @@ export async function POST(request: NextRequest) {
 
   const userId = authData.user.id;
 
-  // Create user_profile row using service role via supabase admin
-  // We use the same client but we need admin rights for insert — however the RLS
-  // policy allows insert when auth.uid() = id, and we just signed up so we are
-  // that user. But server-side the session may not be propagated yet, so we use
-  // the service-role key if available, falling back to a direct insert attempt.
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-
-  let profileError: { message: string } | null = null;
-
-  if (serviceRoleKey) {
-    const { createClient: createSupabaseClient } = await import("@supabase/supabase-js");
-    const adminClient = createSupabaseClient(supabaseUrl, serviceRoleKey);
-    const { error } = await adminClient
-      .from("user_profile")
-      .insert({ id: userId, username, display_name });
-    profileError = error;
-  } else {
-    const { error } = await supabase
-      .from("user_profile")
-      .insert({ id: userId, username, display_name });
-    profileError = error;
-  }
+  // Create user_profile row
+  const { error: profileError } = await supabaseAdmin
+    .from("user_profile")
+    .insert({ id: userId, username, display_name });
 
   if (profileError) {
-    // Attempt to clean up the auth user to avoid orphans
+    // Clean up auth user to avoid orphans
+    await supabaseAdmin.auth.admin.deleteUser(userId);
     return NextResponse.json(
       { error: `프로필 생성 실패: ${profileError.message}` },
       { status: 500 }
     );
   }
+
+  // Create a welcome README.md for the new user
+  await supabaseAdmin
+    .from("folder_tree")
+    .insert({
+      name: "README.md",
+      type: "file",
+      parent_id: null,
+      order: 0,
+      content: `# 안녕하세요, ${display_name}님의 숲입니다!\n\n이 공간에 마크다운 파일을 추가해보세요.\n관리자 페이지에서 파일을 만들거나 ZIP을 업로드할 수 있습니다.`,
+      owner_id: userId,
+    });
 
   return NextResponse.json(
     {

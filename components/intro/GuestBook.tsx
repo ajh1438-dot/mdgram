@@ -2,13 +2,12 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { FolderTreeNode } from "@/types/tree";
 import { useInView } from "./useInView";
 
-interface Post {
+interface GuestbookEntry {
   id: string;
-  name: string;
-  content: string;
+  author_name: string;
+  message: string;
   created_at: string;
 }
 
@@ -24,35 +23,15 @@ function timeAgo(dateStr: string) {
 }
 
 export default function GuestBook() {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<GuestbookEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const { ref, inView } = useInView(0.1);
 
   const fetchPosts = useCallback(async () => {
     try {
-      const res = await fetch("/api/tree");
-      const data: FolderTreeNode[] = await res.json();
-      const allFiles: FolderTreeNode[] = [];
-      function walk(nodes: FolderTreeNode[]) {
-        for (const n of nodes) {
-          if (n.type === "file") allFiles.push(n);
-          if (n.children?.length) walk(n.children);
-        }
-      }
-      walk(data);
-
-      const visitorPosts = allFiles
-        .filter((f) => f.name.includes("소개"))
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 12)
-        .map((f) => ({
-          id: f.id,
-          name: f.name.replace("_소개.md", "").replace(".md", ""),
-          content: f.content ?? "",
-          created_at: f.created_at,
-        }));
-
-      setPosts(visitorPosts);
+      const res = await fetch("/api/guestbook");
+      const data: GuestbookEntry[] = await res.json();
+      setPosts(Array.isArray(data) ? data.slice(0, 12) : []);
     } catch {
       setPosts([]);
     } finally {
@@ -144,15 +123,15 @@ export default function GuestBook() {
               >
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-full bg-[color-mix(in_srgb,var(--accent)_20%,transparent)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">
-                    {post.name[0]?.toUpperCase() ?? "?"}
+                    {post.author_name[0]?.toUpperCase() ?? "?"}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[var(--text)] truncate">{post.name}</p>
+                    <p className="text-sm font-semibold text-[var(--text)] truncate">{post.author_name}</p>
                     <p className="text-xs text-[var(--text-muted)]">{timeAgo(post.created_at)}</p>
                   </div>
                 </div>
                 <p className="text-sm text-[var(--text-muted)] leading-relaxed line-clamp-3">
-                  {post.content.replace(/^#+\s/gm, "").slice(0, 150)}
+                  {post.message.slice(0, 150)}
                 </p>
               </motion.div>
             ))}
@@ -187,14 +166,12 @@ function GuestbookForm({ onPosted }: { onPosted: () => void }) {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/tree", {
+      const res = await fetch("/api/guestbook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: `${name.trim()}_소개.md`,
-          type: "file",
-          parent_id: null,
-          content: message.trim(),
+          author_name: name.trim(),
+          message: message.trim(),
         }),
       });
       if (!res.ok) {
