@@ -22,3 +22,17 @@ body {
   color: var(--text);
   font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
+
+/* Glass panel utility */
+.glass-panel {
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent); }

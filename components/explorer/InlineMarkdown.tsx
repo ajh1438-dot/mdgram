@@ -100,7 +100,15 @@ export default function InlineMarkdown({
             <li className="text-[var(--text)]">{children}</li>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-[var(--accent)] pl-4 my-2 text-[var(--text-muted)] italic">
+            <blockquote
+              className="pl-4 my-2 text-[var(--text-muted)] italic rounded-r-md py-2 pr-3"
+              style={{
+                borderLeft: "3px solid",
+                borderImageSource: "linear-gradient(to bottom, var(--accent), var(--accent-hover))",
+                borderImageSlice: 1,
+                background: "color-mix(in srgb, var(--accent) 6%, transparent)",
+              }}
+            >
               {children}
             </blockquote>
           ),
@@ -126,7 +134,7 @@ export default function InlineMarkdown({
             );
           },
           pre: ({ children }) => (
-            <pre className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-md p-3 my-2 overflow-x-auto text-xs">
+            <pre className="glass-panel rounded-md p-3 my-2 overflow-x-auto text-xs custom-scrollbar">
               {children}
             </pre>
           ),

@@ -14,11 +14,19 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-        {title}
-      </h2>
-      {children}
+    <section className="glass-panel rounded-xl overflow-hidden shadow-sm">
+      {/* Gradient header bar */}
+      <div
+        className="px-5 py-3"
+        style={{ background: "linear-gradient(to right, color-mix(in srgb, var(--accent) 15%, transparent), color-mix(in srgb, var(--accent-hover) 8%, transparent))" }}
+      >
+        <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--accent)" }}>
+          {title}
+        </h2>
+      </div>
+      <div className="p-5 custom-scrollbar">
+        {children}
+      </div>
     </section>
   );
 }

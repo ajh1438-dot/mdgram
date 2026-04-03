@@ -180,13 +180,30 @@ function TBtn({
   onClick,
   disabled,
   danger,
+  primary,
   children,
 }: {
   onClick: () => void;
   disabled?: boolean;
   danger?: boolean;
+  primary?: boolean;
   children: React.ReactNode;
 }) {
+  if (primary) {
+    return (
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all disabled:opacity-40 text-white hover:shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_40%,transparent)]"
+        style={{
+          background: "linear-gradient(to right, var(--accent), var(--accent-hover))",
+          border: "none",
+        }}
+      >
+        {children}
+      </button>
+    );
+  }
   return (
     <button
       onClick={onClick}
@@ -253,10 +270,9 @@ export default function AdminToolbar({
   return (
     <>
       <div
-        className="flex items-center gap-2 px-4 py-2 border-b shrink-0"
+        className="flex items-center gap-2 px-4 py-2 border-b shrink-0 glass-panel"
         style={{
-          backgroundColor: "var(--bg-secondary)",
-          borderColor: "var(--border)",
+          borderColor: "color-mix(in srgb, var(--border) 50%, transparent)",
         }}
       >
         <TBtn onClick={() => setModal({ type: "newFolder" })} disabled={loading}>
@@ -292,7 +308,7 @@ export default function AdminToolbar({
           삭제
         </TBtn>
 
-        <TBtn onClick={onSave}>
+        <TBtn onClick={onSave} primary>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
             <polyline points="17 21 17 13 7 13 7 21" />

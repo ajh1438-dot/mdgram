@@ -14,6 +14,12 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-bg flex items-center justify-center">
+      {/* Background blur orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[var(--accent)]/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[var(--accent-hover)]/10 blur-[120px] rounded-full" />
+      </div>
+
       <MindmapBackground onNodeClick={handleNodeClick} />
 
       <div
@@ -63,7 +69,7 @@ export default function HeroSection() {
               const el = document.getElementById("explore");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="px-6 py-3 rounded-full bg-[var(--accent)] text-white text-sm font-semibold hover:bg-[var(--accent-hover)] transition-colors"
+            className="px-6 py-3 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white text-sm font-semibold transition-all hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
           >

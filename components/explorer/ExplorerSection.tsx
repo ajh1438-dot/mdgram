@@ -45,6 +45,11 @@ export default function ExplorerSection() {
       id="explore"
       className="relative min-h-screen bg-[var(--bg-secondary)] px-4 py-12 sm:px-6 sm:py-20 w-full overflow-x-hidden"
     >
+      {/* Floating background orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[10%] right-[-5%] w-[30%] h-[30%] bg-[var(--accent)]/8 blur-[100px] rounded-full" />
+        <div className="absolute bottom-[5%] left-[-5%] w-[25%] h-[25%] bg-[var(--accent-hover)]/8 blur-[100px] rounded-full" />
+      </div>
       {/* Section header */}
       <div className="max-w-4xl mx-auto mb-8 sm:mb-10">
         <div className="flex items-start justify-between gap-4">
@@ -67,7 +72,7 @@ export default function ExplorerSection() {
 
       {/* Main content card */}
       <div className="max-w-4xl mx-auto">
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-sm overflow-hidden">
+        <div className="glass-panel rounded-2xl shadow-sm overflow-hidden">
           {/* Loading */}
           {state === "loading" && (
             <div className="flex items-center justify-center py-24">
@@ -109,7 +114,7 @@ export default function ExplorerSection() {
 
           {/* Tree */}
           {state === "success" && (
-            <div className="p-6">
+            <div className="p-6 overflow-y-auto custom-scrollbar">
               <OutlineTree nodes={tree} onContextChange={handleContextChange} />
             </div>
           )}

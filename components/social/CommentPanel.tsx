@@ -145,15 +145,30 @@ export default function CommentPanel({
 
   function formatDate(iso: string) {
     try {
+      const diff = Date.now() - new Date(iso).getTime();
+      const minutes = Math.floor(diff / 60000);
+      if (minutes < 1) return "방금";
+      if (minutes < 60) return `${minutes}분 전`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}시간 전`;
+      const days = Math.floor(hours / 24);
+      if (days < 7) return `${days}일 전`;
       return new Date(iso).toLocaleDateString("ko-KR", {
         month: "short",
         day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
       });
     } catch {
       return iso;
     }
+  }
+
+  function avatarColor(name: string) {
+    const colors = [
+      "bg-violet-500", "bg-blue-500", "bg-emerald-500",
+      "bg-orange-500", "bg-pink-500", "bg-cyan-500",
+    ];
+    const idx = name.charCodeAt(0) % colors.length;
+    return colors[idx];
   }
 
   return (
@@ -173,7 +188,7 @@ export default function CommentPanel({
           <motion.div
             key="panel"
             ref={panelRef}
-            className="fixed right-0 top-0 bottom-0 z-50 w-80 max-w-[92vw] flex flex-col bg-[var(--card)] border-l border-[var(--border)] shadow-2xl"
+            className="fixed right-0 top-0 bottom-0 z-50 w-80 max-w-[92vw] flex flex-col glass-panel border-l shadow-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -204,7 +219,7 @@ export default function CommentPanel({
             )}
 
             {/* Comment list */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-0 custom-scrollbar">
               {loading && (
                 <div className="flex items-center gap-2 py-4 justify-center">
                   <span className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
@@ -219,21 +234,33 @@ export default function CommentPanel({
               )}
 
               {!loading &&
-                comments.map((c) => (
-                  <div
-                    key={c.id}
-                    className="rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] px-3 py-2"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-[var(--accent)]">{c.author_name}</span>
-                      <span className="text-[10px] text-[var(--text-muted)]">{formatDate(c.created_at)}</span>
-                    </div>
-                    {c.selected_text && c.selected_text !== selectedRange?.selected_text && (
-                      <p className="text-[10px] text-[var(--text-muted)] italic mb-1 line-clamp-2">
-                        &ldquo;{c.selected_text}&rdquo;
-                      </p>
+                comments.map((c, idx) => (
+                  <div key={c.id}>
+                    {idx > 0 && (
+                      <div className="border-t border-[var(--border)]/40 mx-1" />
                     )}
-                    <p className="text-xs text-[var(--text)] leading-relaxed">{c.content}</p>
+                    <div className="py-3">
+                      <div className="flex items-start gap-2.5">
+                        {/* Avatar initial circle */}
+                        <div
+                          className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${avatarColor(c.author_name)}`}
+                        >
+                          {c.author_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-semibold text-[var(--accent)]">{c.author_name}</span>
+                            <span className="text-[10px] text-[var(--text-muted)]">{formatDate(c.created_at)}</span>
+                          </div>
+                          {c.selected_text && c.selected_text !== selectedRange?.selected_text && (
+                            <p className="text-[10px] text-[var(--text-muted)] italic mb-1 line-clamp-2">
+                              &ldquo;{c.selected_text}&rdquo;
+                            </p>
+                          )}
+                          <p className="text-xs text-[var(--text)] leading-relaxed">{c.content}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
             </div>

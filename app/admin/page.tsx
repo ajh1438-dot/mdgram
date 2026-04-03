@@ -105,19 +105,18 @@ export default function AdminPage() {
       <div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
         {/* Sidebar: file tree */}
         <aside
-          className="flex flex-col shrink-0 border-b sm:border-b-0 sm:border-r overflow-hidden"
+          className="flex flex-col shrink-0 border-b sm:border-b-0 sm:border-r overflow-hidden glass-panel"
           style={{
             width: sidebarOpen ? undefined : undefined,
-            borderColor: "var(--border)",
-            backgroundColor: "var(--bg-secondary)",
+            borderColor: "color-mix(in srgb, var(--border) 50%, transparent)",
           }}
         >
           {/* Sidebar header with collapsible toggle */}
           <div
             className="flex items-center justify-between px-3 py-2 border-b shrink-0"
             style={{
-              borderColor: "var(--border)",
-              backgroundColor: "var(--bg-secondary)",
+              borderColor: "color-mix(in srgb, var(--border) 50%, transparent)",
+              backgroundColor: "transparent",
             }}
           >
             <button
@@ -149,7 +148,7 @@ export default function AdminPage() {
           {/* Tree — collapsible */}
           {sidebarOpen && (
             <div
-              className="overflow-hidden sm:overflow-auto"
+              className="overflow-hidden sm:overflow-auto custom-scrollbar"
               style={{ maxHeight: "40vh", minWidth: "200px" }}
             >
               <div className="sm:w-60">
@@ -177,8 +176,8 @@ export default function AdminPage() {
         <div className="flex flex-1 overflow-hidden">
           {/* Editor — left half */}
           <div
-            className="flex flex-col flex-1 border-r overflow-hidden"
-            style={{ borderColor: "var(--border)" }}
+            className="flex flex-col flex-1 border-r overflow-hidden glass-panel rounded-none"
+            style={{ borderColor: "color-mix(in srgb, var(--border) 50%, transparent)" }}
           >
             <MarkdownEditor
               node={selectedNode?.type === "file" ? selectedNode : null}

@@ -130,6 +130,8 @@ interface OutlineNodeProps {
   onStartEdit: (id: string) => void;
   onEndEdit: (id: string, newContent?: string) => void;
   nodeContents: Record<string, string>;
+  /** Parent folder name to show as badge on file rows */
+  parentFolderName?: string;
 }
 
 function OutlineNode({
@@ -144,6 +146,7 @@ function OutlineNode({
   onStartEdit,
   onEndEdit,
   nodeContents,
+  parentFolderName,
 }: OutlineNodeProps) {
   const [folderOpen, setFolderOpen] = useState(depth === 0);
   const hasChildren = node.children && node.children.length > 0;
@@ -200,6 +203,12 @@ function OutlineNode({
         {isFolder && <ChevronIcon open={folderOpen} />}
         {isFolder ? <FolderIcon open={folderOpen} /> : <FileIcon />}
         <span className="truncate flex-1">{node.name}</span>
+        {/* Category tag badge — shown on file items that belong to a folder */}
+        {isFile && parentFolderName && (
+          <span className="hidden sm:inline-flex flex-shrink-0 items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium leading-none bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] text-[var(--accent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)]">
+            {parentFolderName}
+          </span>
+        )}
         <ReactionBadge node_id={node.id} keyword={keyword} />
         {/* Admin edit pencil for files */}
         {isAdmin && isFile && (
@@ -274,6 +283,7 @@ function OutlineNode({
                 onStartEdit={onStartEdit}
                 onEndEdit={onEndEdit}
                 nodeContents={nodeContents}
+                parentFolderName={node.name}
               />
             </motion.div>
           )}
@@ -296,6 +306,8 @@ interface OutlineTreeInnerProps {
   onStartEdit: (id: string) => void;
   onEndEdit: (id: string, newContent?: string) => void;
   nodeContents: Record<string, string>;
+  /** Name of the parent folder, passed down so file rows can show a badge */
+  parentFolderName?: string;
 }
 
 function OutlineTreeInner({
@@ -310,6 +322,7 @@ function OutlineTreeInner({
   onStartEdit,
   onEndEdit,
   nodeContents,
+  parentFolderName,
 }: OutlineTreeInnerProps) {
   return (
     <div>
@@ -327,6 +340,7 @@ function OutlineTreeInner({
           onStartEdit={onStartEdit}
           onEndEdit={onEndEdit}
           nodeContents={nodeContents}
+          parentFolderName={parentFolderName}
         />
       ))}
     </div>
