@@ -61,7 +61,7 @@ export default function InlineMarkdown({
 
   const markdownContent = (
     <div
-      className="inline-md mt-2 text-sm leading-7 text-[var(--text)] overflow-x-hidden whitespace-normal"
+      className="inline-md mt-3 text-base leading-8 text-[var(--text)] overflow-x-hidden whitespace-normal"
       style={{ overflowWrap: "anywhere", wordBreak: "normal", overflowY: "visible" }}
     >
       <ReactMarkdown
@@ -69,13 +69,13 @@ export default function InlineMarkdown({
         rehypePlugins={[rehypeHighlight]}
         components={{
           h1: ({ children }) => (
-            <h1 className="text-xl font-bold mt-4 mb-2 text-[var(--accent)] border-b border-[var(--accent)]/20 pb-1">{children}</h1>
+            <h1 className="text-2xl font-bold mt-5 mb-3 text-[var(--accent)] border-b border-[var(--accent)]/20 pb-1.5">{children}</h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-lg font-semibold mt-3 mb-1.5 text-[var(--accent)]">{children}</h2>
+            <h2 className="text-xl font-semibold mt-4 mb-2 text-[var(--accent)]">{children}</h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-base font-semibold mt-2 mb-1 text-[var(--accent)]/80">{children}</h3>
+            <h3 className="text-lg font-semibold mt-3 mb-1.5 text-[var(--accent)]/80">{children}</h3>
           ),
           p: ({ children }) => (
             <p className="my-1.5 text-[var(--text)]">{children}</p>

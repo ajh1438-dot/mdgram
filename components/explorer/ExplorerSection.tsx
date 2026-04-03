@@ -46,7 +46,7 @@ export default function ExplorerSection() {
       className="relative min-h-screen bg-[var(--bg-secondary)] px-4 py-12 sm:px-6 sm:py-20 w-full overflow-x-hidden"
     >
       {/* Section header */}
-      <div className="max-w-5xl mx-auto mb-8 sm:mb-10">
+      <div className="max-w-4xl mx-auto mb-8 sm:mb-10">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text)]">
@@ -64,7 +64,7 @@ export default function ExplorerSection() {
       </div>
 
       {/* Main content card */}
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-sm overflow-hidden">
           {/* Loading */}
           {state === "loading" && (

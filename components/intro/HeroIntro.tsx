@@ -23,7 +23,7 @@ interface HeroIntroProps {
 export default function HeroIntro({ onScrollNext, onSwitchToMarkdown }: HeroIntroProps) {
   const [config, setConfig] = useState<SiteConfig>({
     hero_title: "",
-    hero_subtitle: "호기심 천국에 사는\n개척정신 회계사",
+    hero_subtitle: "호기심 천국에 사는\n회계사",
     hero_copy: "",
   });
 
