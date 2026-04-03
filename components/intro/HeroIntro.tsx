@@ -22,8 +22,8 @@ interface HeroIntroProps {
 export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
   const [config, setConfig] = useState<SiteConfig>({
     hero_title: "연결의 숲",
-    hero_subtitle: "호기심 천국에 사는 회계사",
-    hero_copy: "모든 것이 궁금합니다. 그것들을 배우고, 연결합니다.",
+    hero_subtitle: "호기심 천국에 사는\n개척정신 회계사",
+    hero_copy: "서로 관계없어 보이는 것들이 연결되는 숲에 들어와보세요",
   });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
         </motion.div>
 
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-[var(--text)] leading-tight"
+          className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-[var(--text)] leading-tight whitespace-pre-line"
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
@@ -86,8 +86,6 @@ export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
           transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
         >
           {config.hero_copy}
-          <br />
-          <span className="text-[var(--accent)]">그게 제 인생의 행복입니다.</span>
         </motion.p>
 
         <motion.button

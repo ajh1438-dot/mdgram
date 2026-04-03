@@ -6,7 +6,7 @@ import { useInView } from "./useInView";
 const STATS = [
   { label: "회계사 경력", value: "16년차" },
   { label: "자격증", value: "CPA" },
-  { label: "현직", value: "게임사 경영관리" },
+  { label: "현직", value: "그룹사 경영관리" },
 ];
 
 export default function AboutMe() {
@@ -61,8 +61,8 @@ export default function AboutMe() {
                 </svg>
               </div>
               <div className="absolute bottom-6 left-6 right-6">
-                <p className="text-white font-bold text-lg">안지훈</p>
-                <p className="text-white/70 text-sm">호기심 천국에 사는 회계사</p>
+                <p className="text-white font-bold text-lg">호기심 천국에 사는</p>
+                <p className="text-white/70 text-sm">개척정신 회계사</p>
               </div>
             </div>
           </motion.div>
