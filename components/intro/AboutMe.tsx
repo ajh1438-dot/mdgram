@@ -1,85 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { FolderTreeNode } from "@/types/tree";
 import { useInView } from "./useInView";
 
+const STATS = [
+  { label: "회계사 경력", value: "16년차" },
+  { label: "자격증", value: "CPA" },
+  { label: "현직", value: "게임사 경영관리" },
+];
+
 export default function AboutMe() {
-  const [content, setContent] = useState<string>("");
-  const [loading, setLoading] = useState(true);
   const { ref, inView } = useInView(0.15);
-
-  useEffect(() => {
-    fetch("/api/tree")
-      .then((r) => r.json())
-      .then((data: FolderTreeNode[]) => {
-        // Find file containing "저는요" or first file with content
-        const allFiles: FolderTreeNode[] = [];
-        function walk(nodes: FolderTreeNode[]) {
-          for (const n of nodes) {
-            if (n.type === "file") allFiles.push(n);
-            if (n.children?.length) walk(n.children);
-          }
-        }
-        walk(data);
-
-        const aboutFile =
-          allFiles.find((f) => f.name.includes("저는요")) ??
-          allFiles.find((f) => f.name.includes("소개") && f.content) ??
-          allFiles.find((f) => f.content && f.content.length > 50);
-
-        if (aboutFile?.content) {
-          setContent(aboutFile.content);
-        } else {
-          setContent(
-            "# 안녕하세요!\n\n저는 **안지훈**입니다. 호기심이 많은 회계사로, 숫자와 언어 사이 어딘가에 삽니다.\n\n건강, 과학, 영성, 리더십 같은 주제를 탐색하며 생각을 나무처럼 키워가고 있습니다."
-          );
-        }
-      })
-      .catch(() => {
-        setContent(
-          "# 안녕하세요!\n\n저는 **안지훈**입니다. 호기심이 많은 회계사로, 숫자와 언어 사이 어딘가에 삽니다."
-        );
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  // Simple markdown-like render (just paragraphs + bold + headings)
-  function renderSimpleMarkdown(md: string) {
-    return md.split("\n").map((line, i) => {
-      if (line.startsWith("# ")) {
-        return (
-          <h2 key={i} className="text-2xl sm:text-3xl font-bold text-[var(--text)] mb-4">
-            {line.slice(2)}
-          </h2>
-        );
-      }
-      if (line.startsWith("## ")) {
-        return (
-          <h3 key={i} className="text-xl font-semibold text-[var(--accent)] mb-3 mt-6">
-            {line.slice(3)}
-          </h3>
-        );
-      }
-      if (line.startsWith("- ")) {
-        return (
-          <li key={i} className="text-[var(--text-muted)] ml-4 list-disc mb-1">
-            {line.slice(2).replace(/\*\*(.*?)\*\*/g, "$1")}
-          </li>
-        );
-      }
-      if (!line.trim()) return <br key={i} />;
-      const boldified = line.replace(/\*\*(.*?)\*\*/g, (_, m) => `<strong>${m}</strong>`);
-      return (
-        <p
-          key={i}
-          className="text-[var(--text-muted)] leading-relaxed mb-3"
-          dangerouslySetInnerHTML={{ __html: boldified }}
-        />
-      );
-    });
-  }
 
   return (
     <section
@@ -131,33 +62,48 @@ export default function AboutMe() {
               </div>
               <div className="absolute bottom-6 left-6 right-6">
                 <p className="text-white font-bold text-lg">안지훈</p>
-                <p className="text-white/70 text-sm">호기심 천국 회계사</p>
+                <p className="text-white/70 text-sm">호기심 천국에 사는 회계사</p>
               </div>
             </div>
           </motion.div>
 
-          {/* Right: content */}
+          {/* Right: content card */}
           <motion.div
-            className="space-y-4"
+            className="space-y-6"
             initial={{ opacity: 0, x: 40 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            {loading ? (
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-4 rounded bg-[var(--border)] animate-pulse"
-                    style={{ width: `${70 + Math.random() * 30}%` }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="prose prose-sm max-w-none">
-                {renderSimpleMarkdown(content.slice(0, 800))}
-              </div>
-            )}
+            {/* Main card */}
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-7 shadow-sm">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text)] mb-4 leading-snug">
+                호기심 천국에 사는 회계사
+              </h2>
+              <p className="text-[var(--text-muted)] text-base leading-relaxed mb-4">
+                모든 것이 궁금합니다. 그것들을 배우고, 연결합니다.
+              </p>
+              <p className="text-[var(--text-muted)] text-base leading-relaxed">
+                그게 제 인생의 행복입니다.
+              </p>
+            </div>
+
+            {/* Stat line */}
+            <div className="grid grid-cols-3 gap-3">
+              {STATS.map((stat, i) => (
+                <motion.div
+                  key={i}
+                  className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 text-center"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
+                >
+                  <p className="text-[var(--accent)] font-bold text-base sm:text-lg mb-1">
+                    {stat.value}
+                  </p>
+                  <p className="text-[var(--text-muted)] text-xs">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </div>

@@ -91,16 +91,25 @@ export default function GuestBook() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          후기 &amp; 소통
+          랩장님과 참가자 분들께
         </motion.h2>
 
         <motion.p
-          className="text-[var(--text-muted)] mb-10 max-w-xl"
+          className="text-[var(--text-muted)] mb-4 max-w-xl text-lg"
           initial={{ opacity: 0, y: 15 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.15 }}
         >
-          숲을 방문한 사람들의 이야기. 당신도 한 줄 남겨보세요.
+          많은 가르침을 요청드립니다.
+        </motion.p>
+
+        <motion.p
+          className="text-[var(--text-muted)] mb-10 max-w-xl text-sm"
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          어떤 한 마디도 이 숲을 자라게 합니다. 피드백이든, 응원이든, 한 줄이든 — 남겨주세요.
         </motion.p>
 
         {/* Visitor posts */}

@@ -22,8 +22,8 @@ interface HeroIntroProps {
 export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
   const [config, setConfig] = useState<SiteConfig>({
     hero_title: "연결의 숲",
-    hero_subtitle: "생각이 나무처럼 자라고 이야기가 숲을 이루는 곳",
-    hero_copy: "마크다운 서사 소셜 플랫폼",
+    hero_subtitle: "호기심 천국에 사는 회계사",
+    hero_copy: "모든 것이 궁금합니다. 그것들을 배우고, 연결합니다.",
   });
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
         >
-          {config.hero_copy}
+          {config.hero_title}
         </motion.div>
 
         <motion.h1
@@ -76,16 +76,18 @@ export default function HeroIntro({ onScrollNext }: HeroIntroProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
         >
-          {config.hero_title}
+          {config.hero_subtitle}
         </motion.h1>
 
         <motion.p
-          className="mt-5 text-base sm:text-lg md:text-2xl text-[var(--text-muted)] font-medium"
+          className="mt-5 text-base sm:text-lg md:text-xl text-[var(--text-muted)] font-medium max-w-lg"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
         >
-          {config.hero_subtitle}
+          {config.hero_copy}
+          <br />
+          <span className="text-[var(--accent)]">그게 제 인생의 행복입니다.</span>
         </motion.p>
 
         <motion.button

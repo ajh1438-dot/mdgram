@@ -1,115 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FolderTreeNode } from "@/types/tree";
 import { useInView } from "./useInView";
 
 interface InterestCard {
+  emoji: string;
   name: string;
-  fileCount: number;
-  icon: string;
+  headline: string;
+  desc: string;
   color: string;
 }
 
-const ICON_MAP: Record<string, string> = {
-  건강: "💪",
-  과학: "🔬",
-  영성: "🌿",
-  리더십: "🧭",
-  철학: "💭",
-  경제: "📊",
-  AI: "🤖",
-  기술: "⚙️",
-  심리: "🧠",
-  글쓰기: "✍️",
-  독서: "📚",
-  소개: "🌲",
-  생각: "💡",
-  프로젝트: "🚀",
-};
-
-const COLOR_PALETTE = [
-  "var(--accent)",
-  "#22c55e",
-  "#f59e0b",
-  "#ec4899",
-  "#06b6d4",
-  "#8b5cf6",
-  "#f97316",
-  "#14b8a6",
+const INTERESTS: InterestCard[] = [
+  {
+    emoji: "💪",
+    name: "건강",
+    headline: "1년만에 30kg 뺀 파워 다이어터",
+    desc: "인슐린·간헐적단식·저탄고지의 '준 고수'. 몸도 과학으로 이해하면 바꿀 수 있다.",
+    color: "#22c55e",
+  },
+  {
+    emoji: "🔬",
+    name: "과학",
+    headline: "원리를 끝까지 추적",
+    desc: "모든 것에는 과학적 이유가 있을 거라 추정하고, 왜 그런지 밝혀낼 때까지 멈추지 않는다.",
+    color: "#06b6d4",
+  },
+  {
+    emoji: "🌿",
+    name: "삶의 철학",
+    headline: "No Self + 끌어당김의 법칙",
+    desc: "No Self의 자세로 어떻게 끌어당김의 법칙을 실행할 것인가. 내 인생의 오래된 화두.",
+    color: "#8b5cf6",
+  },
+  {
+    emoji: "🧭",
+    name: "리더십·경영",
+    headline: "기업의 성공 방정식",
+    desc: "기업의 성공 방정식은 무엇이고, 나는 나중에 경영을 어떻게 할 것인가. 아직도 공부 중.",
+    color: "#f59e0b",
+  },
+  {
+    emoji: "🔗",
+    name: "통섭·연결",
+    headline: "지식과 끊임없이 연결",
+    desc: "새로운 지식을 끊임없이 추구하되, 내가 가진 지식과 끊임없이 연결한다. 그게 이 숲의 이름이 된 이유.",
+    color: "var(--accent)",
+  },
 ];
 
-function getIcon(name: string) {
-  for (const [key, icon] of Object.entries(ICON_MAP)) {
-    if (name.includes(key)) return icon;
-  }
-  return "🌳";
-}
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.09 },
+  },
+};
 
-function getColor(index: number) {
-  return COLOR_PALETTE[index % COLOR_PALETTE.length];
-}
+const itemVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5 } },
+};
 
 export default function MyInterests() {
-  const [cards, setCards] = useState<InterestCard[]>([]);
-  const [loading, setLoading] = useState(true);
   const { ref, inView } = useInView(0.1);
-
-  useEffect(() => {
-    fetch("/api/tree")
-      .then((r) => r.json())
-      .then((data: FolderTreeNode[]) => {
-        // Top-level folders
-        const folders = data.filter((n) => n.type === "folder");
-
-        if (folders.length > 0) {
-          const result: InterestCard[] = folders.map((folder, i) => {
-            const fileCount = (folder.children ?? []).filter((c) => c.type === "file").length;
-            return {
-              name: folder.name,
-              fileCount,
-              icon: getIcon(folder.name),
-              color: getColor(i),
-            };
-          });
-          setCards(result);
-        } else {
-          // Fallback hardcoded
-          setCards(
-            ["건강", "과학", "영성", "리더십", "철학", "AI", "독서", "글쓰기"].map((name, i) => ({
-              name,
-              fileCount: Math.floor(Math.random() * 8) + 1,
-              icon: getIcon(name),
-              color: getColor(i),
-            }))
-          );
-        }
-      })
-      .catch(() => {
-        setCards(
-          ["건강", "과학", "영성", "리더십"].map((name, i) => ({
-            name,
-            fileCount: 0,
-            icon: getIcon(name),
-            color: getColor(i),
-          }))
-        );
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.07 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5 } },
-  };
 
   return (
     <section
@@ -137,7 +90,7 @@ export default function MyInterests() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          내 관심사
+          관심사가 다양하고 독서를 좋아한다
         </motion.h2>
 
         <motion.p
@@ -149,50 +102,51 @@ export default function MyInterests() {
           숲의 각 구역은 내가 오랫동안 탐색해온 주제들입니다.
         </motion.p>
 
-        {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          variants={containerVariants}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+        >
+          {INTERESTS.map((card, i) => (
+            <motion.div
+              key={i}
+              variants={itemVariants}
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="group relative bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 cursor-default overflow-hidden transition-shadow hover:shadow-lg"
+            >
+              {/* Accent corner decoration */}
               <div
-                key={i}
-                className="h-32 rounded-2xl bg-[var(--card)] border border-[var(--border)] animate-pulse"
+                className="absolute top-0 right-0 w-20 h-20 rounded-bl-3xl opacity-10 transition-opacity group-hover:opacity-20"
+                style={{ background: card.color }}
               />
-            ))}
-          </div>
-        ) : (
-          <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
-            variants={containerVariants}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-          >
-            {cards.map((card, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                whileHover={{ y: -4, scale: 1.02 }}
-                className="group relative bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 cursor-default overflow-hidden transition-shadow hover:shadow-lg"
+
+              <div className="text-3xl mb-3">{card.emoji}</div>
+
+              <div
+                className="inline-block text-xs font-bold px-2.5 py-0.5 rounded-full mb-3"
+                style={{
+                  background: `color-mix(in srgb, ${card.color} 15%, transparent)`,
+                  color: card.color,
+                  border: `1px solid color-mix(in srgb, ${card.color} 30%, transparent)`,
+                }}
               >
-                {/* Accent corner decoration */}
-                <div
-                  className="absolute top-0 right-0 w-16 h-16 rounded-bl-3xl opacity-10 transition-opacity group-hover:opacity-20"
-                  style={{ background: card.color }}
-                />
+                {card.name}
+              </div>
 
-                <div className="text-3xl mb-3">{card.icon}</div>
-                <h3 className="font-semibold text-[var(--text)] text-sm mb-1">{card.name}</h3>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {card.fileCount > 0 ? `${card.fileCount}개의 글` : "탐색 중"}
-                </p>
+              <h3 className="font-semibold text-[var(--text)] text-sm mb-2 leading-snug">
+                {card.headline}
+              </h3>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">{card.desc}</p>
 
-                {/* Bottom accent bar */}
-                <div
-                  className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-300"
-                  style={{ background: card.color }}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+              {/* Bottom accent bar */}
+              <div
+                className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-300"
+                style={{ background: card.color }}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
