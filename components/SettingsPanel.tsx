@@ -4,8 +4,32 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FolderTreeNode } from "@/types/tree";
 
-type Theme = "dark" | "light" | "forest";
+type Theme =
+  | "dark"
+  | "light"
+  | "forest"
+  | "minimal"
+  | "things"
+  | "blue-topaz"
+  | "sanctum"
+  | "dracula"
+  | "nord"
+  | "atom";
+
 const STORAGE_KEY = "forest-theme";
+
+const ALL_THEMES: Theme[] = [
+  "dark",
+  "light",
+  "forest",
+  "minimal",
+  "things",
+  "blue-topaz",
+  "sanctum",
+  "dracula",
+  "nord",
+  "atom",
+];
 
 const THEME_CONFIG: Record<
   Theme,
@@ -32,6 +56,55 @@ const THEME_CONFIG: Record<
     text: "#d4e7d4",
     border: "#1a3a1a",
   },
+  minimal: {
+    label: "미니멀",
+    bg: "#f4f4f4",
+    accent: "#5c7cfa",
+    text: "#2e3338",
+    border: "#d8d8d8",
+  },
+  things: {
+    label: "띵스",
+    bg: "#ffffff",
+    accent: "#2eaadc",
+    text: "#37352f",
+    border: "#e9e9e7",
+  },
+  "blue-topaz": {
+    label: "블루토파즈",
+    bg: "#1e2029",
+    accent: "#00b4d8",
+    text: "#d4d4d8",
+    border: "#2e3244",
+  },
+  sanctum: {
+    label: "생텀",
+    bg: "#f5f0e8",
+    accent: "#8b6914",
+    text: "#3d3929",
+    border: "#d9d2c2",
+  },
+  dracula: {
+    label: "드라큘라",
+    bg: "#282a36",
+    accent: "#bd93f9",
+    text: "#f8f8f2",
+    border: "#44475a",
+  },
+  nord: {
+    label: "노드",
+    bg: "#2e3440",
+    accent: "#88c0d0",
+    text: "#d8dee9",
+    border: "#3b4252",
+  },
+  atom: {
+    label: "아톰",
+    bg: "#21252b",
+    accent: "#61afef",
+    text: "#abb2bf",
+    border: "#2c313a",
+  },
 };
 
 interface AuthState {
@@ -55,7 +128,7 @@ export default function SettingsPanel({ onAdminSelectFile }: SettingsPanelProps)
   // Load saved theme on mount
   useEffect(() => {
     const saved = (localStorage.getItem(STORAGE_KEY) as Theme) ?? "dark";
-    setTheme(["dark", "light", "forest"].includes(saved) ? (saved as Theme) : "dark");
+    setTheme((ALL_THEMES as string[]).includes(saved) ? (saved as Theme) : "dark");
   }, []);
 
   // Fetch auth state when panel opens
@@ -223,34 +296,38 @@ export default function SettingsPanel({ onAdminSelectFile }: SettingsPanelProps)
                 {/* Section: 스킨 변경 */}
                 <div className="px-5 py-4 border-b border-[var(--border)]">
                   <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest mb-3">스킨 변경</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(Object.entries(THEME_CONFIG) as [Theme, typeof THEME_CONFIG[Theme]][]).map(([key, cfg]) => (
-                      <button
-                        key={key}
-                        onClick={() => applyTheme(key)}
-                        className={[
-                          "rounded-xl border-2 p-2 text-center transition-all",
-                          theme === key
-                            ? "border-[var(--accent)] shadow-sm scale-105"
-                            : "border-[var(--border)] hover:border-[var(--accent)] hover:scale-105",
-                        ].join(" ")}
-                        style={{ background: cfg.bg }}
-                      >
-                        {/* Preview swatch */}
-                        <div className="flex gap-1 justify-center mb-1.5">
-                          <div className="w-2.5 h-2.5 rounded-full" style={{ background: cfg.accent }} />
-                          <div className="w-2.5 h-2.5 rounded-full" style={{ background: cfg.text, opacity: 0.4 }} />
-                        </div>
-                        <span className="text-[10px] font-medium" style={{ color: cfg.text }}>
-                          {cfg.label}
-                        </span>
-                        {theme === key && (
-                          <div className="mt-1 flex justify-center">
-                            <div className="w-1 h-1 rounded-full" style={{ background: cfg.accent }} />
+                  <div className="grid grid-cols-2 gap-2">
+                    {ALL_THEMES.map((key) => {
+                      const cfg = THEME_CONFIG[key];
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => applyTheme(key)}
+                          className={[
+                            "rounded-xl border-2 px-2.5 py-2 flex items-center gap-2 transition-all text-left",
+                            theme === key
+                              ? "border-[var(--accent)] shadow-sm scale-[1.03]"
+                              : "border-[var(--border)] hover:border-[var(--accent)] hover:scale-[1.03]",
+                          ].join(" ")}
+                          style={{ background: cfg.bg }}
+                        >
+                          {/* Preview dots: bg, accent, text */}
+                          <div className="flex flex-col gap-0.5 flex-shrink-0">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: cfg.accent }} />
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: cfg.text, opacity: 0.5 }} />
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }} />
                           </div>
-                        )}
-                      </button>
-                    ))}
+                          <div className="min-w-0 flex-1">
+                            <span className="text-[10px] font-medium block truncate" style={{ color: cfg.text }}>
+                              {cfg.label}
+                            </span>
+                            {theme === key && (
+                              <span className="text-[9px]" style={{ color: cfg.accent }}>✓ 선택됨</span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

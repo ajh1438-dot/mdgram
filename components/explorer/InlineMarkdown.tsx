@@ -60,7 +60,10 @@ export default function InlineMarkdown({
   void comments;
 
   const markdownContent = (
-    <div className="inline-md mt-2 text-sm leading-7 text-[var(--text)]">
+    <div
+      className="inline-md mt-2 text-sm leading-7 text-[var(--text)] overflow-x-hidden"
+      style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}

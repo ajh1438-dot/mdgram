@@ -2,14 +2,42 @@
 
 import { useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "forest";
+type Theme =
+  | "dark"
+  | "light"
+  | "forest"
+  | "minimal"
+  | "things"
+  | "blue-topaz"
+  | "sanctum"
+  | "dracula"
+  | "nord"
+  | "atom";
 
-const THEMES: Theme[] = ["dark", "light", "forest"];
+const THEMES: Theme[] = [
+  "dark",
+  "light",
+  "forest",
+  "minimal",
+  "things",
+  "blue-topaz",
+  "sanctum",
+  "dracula",
+  "nord",
+  "atom",
+];
 
 const THEME_META: Record<Theme, { icon: string; label: string }> = {
-  dark:   { icon: "🌙", label: "Dark" },
-  light:  { icon: "☀️", label: "Light" },
-  forest: { icon: "🌲", label: "Forest" },
+  dark:         { icon: "🌙", label: "Dark" },
+  light:        { icon: "☀️", label: "Light" },
+  forest:       { icon: "🌲", label: "Forest" },
+  minimal:      { icon: "⬜", label: "Minimal" },
+  things:       { icon: "🍎", label: "Things" },
+  "blue-topaz": { icon: "💎", label: "Blue Topaz" },
+  sanctum:      { icon: "📜", label: "Sanctum" },
+  dracula:      { icon: "🧛", label: "Dracula" },
+  nord:         { icon: "❄️", label: "Nord" },
+  atom:         { icon: "⚛️", label: "Atom" },
 };
 
 const STORAGE_KEY = "forest-theme";
@@ -25,7 +53,7 @@ export default function ThemeToggle() {
   /* Read saved theme on mount */
   useEffect(() => {
     const saved = (localStorage.getItem(STORAGE_KEY) as Theme) ?? "dark";
-    const valid = THEMES.includes(saved) ? saved : "dark";
+    const valid = (THEMES as string[]).includes(saved) ? (saved as Theme) : "dark";
     applyTheme(valid);
     setTheme(valid);
   }, []);

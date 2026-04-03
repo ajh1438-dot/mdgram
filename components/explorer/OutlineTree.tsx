@@ -180,7 +180,7 @@ function OutlineNode({
   }
 
   return (
-    <div className={indentClass}>
+    <div className={`${indentClass} overflow-hidden`}>
       {/* Row */}
       <div
         role={isFolder ? "button" : undefined}
@@ -189,7 +189,7 @@ function OutlineNode({
         onKeyDown={handleKeyDown}
         className={[
           "group flex items-center gap-1.5 py-1 pr-2 rounded-md cursor-pointer",
-          "text-xs sm:text-sm select-none",
+          "text-xs sm:text-sm select-none min-w-0",
           "hover:bg-[var(--bg-secondary)] transition-colors duration-100",
           isFolder
             ? "font-medium text-[var(--text)]"
@@ -395,9 +395,9 @@ export default function OutlineTree({ nodes, onContextChange }: OutlineTreeProps
   }
 
   return (
-    <div className="divide-y divide-[var(--border)]">
+    <div className="divide-y divide-[var(--border)] overflow-hidden">
       {nodes.map((node) => (
-        <div key={node.id} className="py-1">
+        <div key={node.id} className="py-1 overflow-hidden">
           <OutlineNode
             node={node}
             depth={0}

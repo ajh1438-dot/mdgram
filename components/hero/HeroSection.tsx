@@ -49,9 +49,9 @@ export default function HeroSection() {
       />
 
       {/* Hero text */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-2xl">
+      <div className="relative z-10 flex flex-col items-center text-center px-4 sm:px-6 max-w-2xl w-full overflow-hidden">
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-text leading-tight"
+          className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-text leading-tight break-words"
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
